@@ -5,7 +5,6 @@ Notion → 網頁資料同步。由 .github/workflows/daily.yml 每天執行。
   index.json            有哪些日期、最新是哪天（首頁先讀這個）
   days/YYYY-MM-DD.json  某一天的總覽與全部事件（首頁、歸檔頁讀這個）
   claims.json           爆料查證追蹤的全部說法（查證追蹤頁）
-  principles.json       Notion 主頁的編輯原則段落（編輯原則頁）
 照片存在 photos/日期/事件ID.webp；每日插畫（每日總覽頁面的封面圖）存在 illustrations/日期.webp。
 
 只需要一個 GitHub Secret：NOTION_TOKEN。沒設定就跳過，不改任何檔案。
@@ -312,7 +311,20 @@ def build(api, save_images=True):
     issue_rows = api.query(DS["issues"])
 
     events = {nid(p["id"]): p for p in ev_rows}
-    ev_brief = {k: {"id": k, "date": prop(p, "日期"), "title": prop(p, "事件標題")} for k, p in events.items()}
+
+    # 只認「有上網頁的那幾天」的事件：試跑、作廢的舊事件不會出現在前情或查證結果裡
+    def day_ids(d):
+        ids = [e for e in (prop(d, "當日事件") or []) if e in events]
+        return ids or [k for k, p in events.items() if prop(p, "日期") == prop(d, "日期")]
+    published_days = {}
+    for d in day_rows:
+        date = prop(d, "日期")
+        if date and prop(d, "執行狀態") in PUBLISH_STATUS:
+            # 同一天有兩筆會上網頁的總覽時，用最後編輯的那筆
+            if date not in published_days or d.get("last_edited_time", "") > published_days[date].get("last_edited_time", ""):
+                published_days[date] = d
+    published = {k for d in published_days.values() for k in day_ids(d)}
+    ev_brief = {k: {"id": k, "date": prop(events[k], "日期"), "title": prop(events[k], "事件標題")} for k in published}
     issues = {nid(p["id"]): {"id": nid(p["id"]), "name": prop(p, "議題名稱"), "background": prop(p, "背景說明"),
                              "events": prop(p, "事件") or []} for p in issue_rows}
 
@@ -371,13 +383,8 @@ def build(api, save_images=True):
     # 每天
     (DATA / "days").mkdir(parents=True, exist_ok=True)
     index_days = []
-    for d in day_rows:
-        date = prop(d, "日期")
-        if not date or prop(d, "執行狀態") not in PUBLISH_STATUS:
-            continue
-        ids = [e for e in (prop(d, "當日事件") or []) if e in events]
-        if not ids:
-            ids = [k for k, p in events.items() if prop(p, "日期") == date]
+    for date, d in published_days.items():
+        ids = day_ids(d)
         evs = sorted((event_json(k, events[k]) for k in ids), key=lambda e: (e["order"], e["title"] or ""))
         illo = cover_url(d)
         day = {
@@ -418,10 +425,6 @@ def build(api, save_images=True):
         })
     claims.sort(key=lambda c: (c["saidOn"] or "", c["checkedOn"] or ""), reverse=True)
     write(DATA / "claims.json", {"claims": claims})
-
-    # 編輯原則
-    secs = sections(api.children(MAIN_PAGE))
-    write(DATA / "principles.json", {"sections": [s for s in secs if s["title"] in PRINCIPLE_SECTIONS]})
 
     write(DATA / "index.json", {
         "generatedAt": datetime.now(TZ).isoformat(timespec="seconds"),

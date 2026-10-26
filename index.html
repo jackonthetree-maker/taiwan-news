@@ -356,7 +356,6 @@ async function getJSON(path){
 const getIndex = () => getJSON('data/index.json');
 const getDay = d => getJSON(`data/days/${d}.json`);
 const getClaims = () => getJSON('data/claims.json');
-const getPrinciples = () => getJSON('data/principles.json');
 
 /* ---------- 小工具 ---------- */
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

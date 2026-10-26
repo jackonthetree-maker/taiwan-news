@@ -4,56 +4,41 @@
 
 網站：https://jackonthetree-maker.github.io/taiwan-news/
 
-## 運作方式
+## 每天的流程
 
-1. 新聞整理程式每天 06:21 開始，約 9 點前把當天資料寫進 Notion。
-2. GitHub Actions 在台灣時間 09:07、10:07 各跑一次 `scripts/sync_notion.py`：
-   - 讀 Notion 五個資料庫和主頁的編輯原則
-   - 輸出網頁用的 JSON 到 `data/`
-   - 抓每則事件第一個來源的分享封面圖，存到 `photos/日期/事件ID.webp`
-   - 「每日總覽」頁面若有封面圖，當作當天插畫存到 `illustrations/日期.webp`
-3. 有變動就自動存回專案，GitHub Pages 約一分鐘後更新。
+| 時間（台灣） | 誰 | 做什麼 |
+|---|---|---|
+| 06:21 | Claude 排程「台灣新聞每日彙整」 | 照 Notion《📘 執行手冊》整理新聞，寫進 Notion，最後把每日總覽設成「已完成／部分完成」 |
+| 08:31 | Claude 排程「台灣新聞補跑檢查」 | 早上沒跑完才接手補完 |
+| 08:07～10:37 每半小時 | GitHub Actions「每日同步 Notion」 | 執行 `scripts/sync_notion.py`，有新資料才更新網站 |
+| 每月 1 號 09:51 | Claude 排程「新聞網站每月檢查」 | 檢查網站大小、同步紀錄、照片是否齊全 |
 
-網頁只讀 `data/` 裡的檔案，不直接接觸 Notion，金鑰不會出現在網頁上。
+分工：網頁、寫法規則、Notion 欄位由網頁這邊的 chat 維護（直接改執行手冊與主頁）；每日排程只照執行手冊執行。
 
-## 頁面
+## 網站頁面
 
 | 網址 | 內容 |
 |---|---|
-| `#today` | 首頁，只放最新一天：今日三件重點、追蹤更新、事件列表 |
-| `#e-日期-ID` | 事件內頁：一句話看懂 → 已確認的事實 → 各方說法 → 各家報導的差異 → 查證說明 → 看完你可以怎麼想 → 前情 → 來源 |
-| `#claims` | 查證追蹤：所有說法與狀態，可依狀態、發言者、政黨篩選 |
-| `#archive`、`#d-日期` | 歷史歸檔，一天一頁 |
-| `#principles` | 編輯原則 |
+| `#today` | 首頁：類別分頁，每類依「主要性質 → 查證狀態 → 排序」自動排列 |
+| `#e-日期-ID` | 事件頁：總結 → 前情 → 事實 → 各方怎麼說（人物／媒體）→ 查證與來源（摺疊） |
+| `#claims` | 查證結果：依新聞分組；追蹤中、久未舉證收在摺疊區 |
+| `#principles` | 說明：性質、排序、媒體立場、標記、做法（網頁自己的精簡版） |
+| `#d-日期`、`#archive` | 舊的日期頁，導覽裡不顯示，供前情等連結使用 |
 
 ## 資料檔
 
 | 檔案 | 內容 |
 |---|---|
 | `data/index.json` | 有哪些日期、最新是哪天 |
-| `data/days/日期.json` | 當天總覽與全部事件（含內文） |
+| `data/days/日期.json` | 當天全部事件（含內文） |
 | `data/claims.json` | 爆料查證追蹤的全部說法 |
-| `data/principles.json` | 主頁的「編輯原則、說法分類、不實說法處理、選題原則」 |
+| `photos/日期/事件ID.webp` | 每則新聞的照片（取「來源連結」第一個網址的分享圖） |
+| `illustrations/日期.webp` | 每日插畫（每日總覽頁面的封面圖，選用） |
 
-首頁只讀 `index.json` 和最新一天的檔案，歷史資料再多也不會變慢。
+同步程式只採用「執行狀態」為已完成或部分完成的每日總覽；試跑、作廢的事件不會出現在網站或前情連結裡。
 
-## Notion 對應
+## 設定
 
-| Notion | 用在 |
-|---|---|
-| 🗞️ 每日事件 | 事件卡片與內頁。屬性：事件標題、一句話摘要、類別、內容性質、查證狀態、排序、比對媒體數、獨立來源數、立場缺口、來源連結、議題、爆料查證。內文用「## 標題」分段 |
-| 📅 每日總覽 | 今日三件重點、追蹤更新（一行一則，最多 5 則）、涵蓋時段。「執行狀態」為已完成或部分完成才會上網頁 |
-| 🔍 爆料查證追蹤 | 查證追蹤頁、事件內頁的相關查證 |
-| 🧵 議題追蹤 | 前情：同一議題、日期較早的事件 |
-| 📰 來源名單 | 來源的立場標示（依網址網域比對） |
-
-資料庫 ID 寫在 `scripts/sync_notion.py` 最上面。
-
-## 第一次接上 Notion
-
-1. 到 https://www.notion.so/profile/integrations 建立一個 internal integration，權限只要「讀取內容」，複製它的金鑰。
-2. 在 Notion 打開「新聞中立分析平台」主頁 → 右上角 ⋯ → 連線（Connections）→ 加入剛建立的 integration。底下的資料庫會一起授權。
-3. 到 GitHub 專案 Settings → Secrets and variables → Actions → New repository secret，名稱 `NOTION_TOKEN`，貼上金鑰。
-4. 到 Actions → 「每日同步 Notion」→ Run workflow，手動跑一次確認。
-
-沒設定 `NOTION_TOKEN` 前，排程會直接跳過，網頁繼續顯示目前的預覽資料。
+- GitHub Secret `NOTION_TOKEN`：Notion integration 的金鑰（integration 需連到「新聞中立分析平台」主頁）。
+- 資料庫 ID 寫在 `scripts/sync_notion.py` 最上面。
+- 想馬上更新網站：Actions →「每日同步 Notion」→ Run workflow。
