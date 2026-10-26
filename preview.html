@@ -274,6 +274,13 @@ figcaption{font-size:12px;color:var(--muted)}
 .summary .rich,.summary .think .rich{font-size:16.5px;line-height:1.75;color:var(--fg)}
 .summary h2,.summary .think h2{font-size:13px !important;color:var(--muted);font-weight:700;margin:0 0 4px}
 .series{align-self:flex-start;font-size:12.5px;color:var(--fg2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.need{background:var(--soft) !important;color:var(--muted) !important;font-size:13px !important}
+.need b{color:var(--fg2) !important;font-weight:600}
+.say > .pill,.checks .pill{font-size:12.5px;font-weight:700;padding:4px 10px}
+.say{display:block}
+.say > .pill{display:inline-flex;margin-right:6px;vertical-align:2px}
+.say .by{display:block;margin-top:2px}
+.say .need{margin-top:6px}
 </style>
 </head>
 <body>
@@ -575,12 +582,12 @@ function sourcesHTML(e){
 }
 
 /* 一行：幾家媒體報導、各立場幾家 */
-function covLineHTML(e){
+function covLineHTML(e, date){
   const cv = coverage(e), total = e.mediaCount != null ? e.mediaCount : cv.green.length + cv.neutral.length + cv.blue.length + cv.other.length;
   const dots = [['green','g','偏綠'],['neutral','n','中立'],['blue','b','偏藍']].map(([k, c, l]) =>
     `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('');
   const gap = e.gap && !/^無/.test(e.gap.trim()) ? `<p class="gapline">要注意：${esc(e.gap)}</p>` : '';
-  return `<div class="covline"><span>${total} 家媒體報導</span><span class="covmini">${dots}</span></div>${gap}`;
+  return `<div class="covline"><span>${date ? date + ' · ' : ''}${total} 家媒體報導</span><span class="covmini">${dots}</span></div>${gap}`;
 }
 
 /* 媒體怎麼寫：依立場分組，跟「人物怎麼說」同一種卡片；跨媒體的提醒另外列在「要注意」 */
@@ -697,8 +704,7 @@ async function viewEvent(date, id){
       <a class="iconbtn" href="#d-${e.date}" aria-label="回到 ${fmtShort(e.date)} 的事件列表">${I.back}</a>
       <div class="pills">${statusPills(e)}</div>
       <h1 class="ttl">${esc(e.title)}</h1>
-      <p class="meta">${fmtShort(e.date)}</p>
-      ${covLineHTML(e)}
+      ${covLineHTML(e, fmtShort(e.date))}
       <figure><div class="photo">${img(p.url, '新聞照片', e.title)}</div>
         ${p.credit ? `<figcaption>照片：${esc(p.credit)}${p.source ? ` · <a href="${esc(p.source)}" target="_blank" rel="noopener">原文</a>` : ''}</figcaption>` : ''}</figure>
     </div>
