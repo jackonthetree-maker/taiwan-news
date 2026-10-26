@@ -331,10 +331,16 @@ const EVENT_MARKS = ['✅','⚖','⏳','❌'];
 const CLAIM_MARKS = ['✅','🔍','💬','⚠','✂','❌','🕐'];
 const MARK_RE = /^\s*(✅|🔍|💬|⚖️?|⏳|⚠️?|✂️?|❌|🕐)\s*/;
 const markKey = s => { const m = (s || '').match(MARK_RE); return m ? m[1].replace(/️/g, '') : null; };
-const statusPill = s => {
+const EVENT_LABEL = { '✅':['✅','經過已證實','s-ok','事件本身（誰、何時、做了什麼）已有一手資料或多家各自採訪的報導證實；事件裡個別的說法另外標示'] };
+const pendingCount = e => {
+  const s = (e.sections || []).find(x => x.title.startsWith('各方說法')); let n = 0;
+  const walk = ns => (ns || []).forEach(x => { if (/^\s*🔍/.test(runsText(x.r))) n++; walk(x.c); });
+  if (s) walk(s.body); return n;
+};
+const statusPill = (s, ev) => {
   const k = markKey(s);
   if (!k) return s ? `<span class="pill s-wait">${esc(s)}</span>` : '';
-  const [e, l, c, d] = LABELS[k];
+  const [e, l, c, d] = (ev && EVENT_LABEL[k]) || LABELS[k];
   return `<span class="pill ${c}" title="${esc(d)}">${e} ${l}</span>`;
 };
 const labelOf = s => { const k = markKey(s); return k ? `${LABELS[k][0]} ${LABELS[k][1]}` : (s || ''); };
@@ -394,10 +400,15 @@ function nodesHTML(nodes){
 
 const img = (url, label, alt) => url
   ? `<img src="${esc(url)}" alt="${esc(alt || '')}" loading="lazy" data-fallback="${esc(label)}">` : esc(label);
-const statusPills = e => `
-  ${e.category ? `<span class="pill">${esc(e.category)}</span>` : ''}
-  ${e.check ? statusPill(e.check) : ''}
-  ${e.nature ? `<span class="pill line">${esc(e.nature)}</span>` : ''}`;
+const NATURE = { '🔀 混合':'🔀 政策＋選戰' };
+const statusPills = (e, hideCat) => {
+  const pend = markKey(e.check) === '✅' ? pendingCount(e) : 0;
+  return `
+  ${e.category && !hideCat ? `<span class="pill">${esc(e.category)}</span>` : ''}
+  ${e.check ? statusPill(e.check, true) : ''}
+  ${pend ? `<span class="pill s-mid" title="這則裡還沒有證據的說法">🔍 ${pend} 項待證據</span>` : ''}
+  ${e.nature ? `<span class="pill line">${esc(NATURE[e.nature] || e.nature)}</span>` : ''}`;
+};
 
 /* ---------- 畫面 ---------- */
 const state = { cat:'全部', cf:{ status:'全部', speaker:'', party:'' } };
@@ -410,7 +421,7 @@ function eventCard(e){
   tags.push(`<span class="covmini" aria-label="偏綠 ${cv.green.length} 家、中立 ${cv.neutral.length} 家、偏藍 ${cv.blue.length} 家">${
     [['green','g','綠'],['neutral','n','中'],['blue','b','藍']].map(([k, c, l]) => `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('')}</span>`);
   return `<a class="card" href="#e-${e.date}-${e.id}">
-    <div class="pills">${statusPills(e)}</div>
+    <div class="pills">${statusPills(e, state.cat !== '全部')}</div>
     <div class="main">
       <div style="min-width:0"><h3>${esc(e.title)}</h3>${e.summary ? `<p>${esc(e.summary)}</p>` : ''}</div>
       <div class="thumb">${img(e.photo && e.photo.url, '照片', e.title)}</div>
@@ -767,9 +778,9 @@ async function viewArchive(){
 }
 
 function legendSection(){
-  const dl = keys => `<dl>${keys.map(k => { const [e, l, c, d] = LABELS[k]; return `<dt><span class="pill ${c}">${e} ${l}</span></dt><dd>${esc(d)}</dd>`; }).join('')}</dl>`;
+  const dl = (keys, ev) => `<dl>${keys.map(k => { const [e, l, c, d] = (ev && EVENT_LABEL[k]) || LABELS[k]; return `<dt><span class="pill ${c}">${e} ${l}</span></dt><dd>${esc(d)}</dd>`; }).join('')}</dl>`;
   return `<section class="sec"><h2>標記說明</h2><div class="legend2">
-    <div><h3>整則事件的查證狀態</h3>${dl(EVENT_MARKS)}</div>
+    <div><h3>整則事件的查證狀態</h3>${dl(EVENT_MARKS, true)}</div>
     <div><h3>單一說法的標記</h3>${dl(CLAIM_MARKS)}</div>
     <div><h3>媒體立場</h3><dl>
       <dt><span class="pill l-green">偏綠</span></dt><dd>一般認為立場較接近民進黨的媒體</dd>
