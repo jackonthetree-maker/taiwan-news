@@ -332,7 +332,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .crow + .crow{border-top:1px dashed var(--line);padding-top:12px}
 .crow h3{font-size:15.5px;line-height:1.55}
 .speaker h3 .role{font-size:13px;font-weight:500;color:var(--muted)}
-.claim .still{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.claim .still{font-size:13.5px;color:var(--fg2);border-top:1px solid var(--line);padding-top:10px;min-height:44px;display:flex;align-items:center;text-decoration:none}
 </style>
 </head>
 <body>
@@ -860,7 +860,7 @@ async function viewClaims(){
     <section class="list">${groupByNews(resolved).map(g => `<article class="claim">
       ${g.ev ? `<a class="gtitle" href="#e-${g.ev.date}-${g.ev.id}"><span>${fmtShort(g.ev.date)} 的新聞</span>${esc(g.ev.title)}</a>` : '<p class="gtitle"><span>其他</span></p>'}
       ${g.list.map(claimCard).join('')}
-      ${g.ev && pendingFor[g.ev.id] ? `<p class="still">這則還有 ${pendingFor[g.ev.id]} 項待證據</p>` : ''}</article>`).join('') || '<p class="empty">目前還沒有查出結果的說法。</p>'}</section>
+      ${g.ev && pendingFor[g.ev.id] ? `<a class="still" href="#e-${g.ev.date}-${g.ev.id}">這則還有 ${pendingFor[g.ev.id]} 項待證據，回到新聞看 →</a>` : ''}</article>`).join('') || '<p class="empty">目前還沒有查出結果的說法。</p>'}</section>
     <section class="deeper">${fold('🔍 追蹤中', pending)}${fold('🕐 超過 30 天沒拿出證據', stale)}</section>
     <a class="morelink" href="#principles">標記是什麼意思？看「說明」頁 →</a>`;
 }
