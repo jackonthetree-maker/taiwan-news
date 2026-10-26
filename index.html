@@ -319,6 +319,13 @@ figcaption{font-size:12px;color:var(--muted)}
 .explain dd{margin:0;color:var(--fg2);font-size:15px;line-height:1.6}
 .explain ul,.explain ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;color:var(--fg2)}
 .explain .small{font-size:13.5px;color:var(--muted)}
+.claim .result{font-size:15px;line-height:1.65;color:var(--fg)}
+.claim .more summary{cursor:pointer;font-size:13.5px;color:var(--muted);min-height:36px;display:flex;align-items:center}
+.claim .more[open]{display:flex;flex-direction:column;gap:8px}
+.minis{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.minis li{display:flex;flex-direction:column;gap:3px;padding-block:10px;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.55}
+.minis li span{font-size:13px;color:var(--muted)}
+.minis li a{font-size:13px;align-self:flex-start;min-height:28px;display:inline-flex;align-items:center}
 </style>
 </head>
 <body>
@@ -764,7 +771,7 @@ async function viewEvent(date, id){
   const chk = get('查證說明');
   const chkFold = (chk && chk.body.length) || claims.length ? `<details class="fold"><summary><span>怎麼查證的</span></summary><div class="inner">
     ${chk ? `<ul class="checks">${chk.body.map(n => `<li>${withMark(n.r)}${n.c ? nodesHTML(n.c) : ''}</li>`).join('')}</ul>` : ''}
-    ${claims.length ? `<a class="morelink" href="#claims">這則有 ${claims.length} 條說法在「查證追蹤」持續追蹤 →</a>` : ''}</div></details>` : '';
+    ${claims.length ? `<a class="morelink" href="#claims">這則有 ${claims.length} 條說法在「查證」頁持續追蹤 →</a>` : ''}</div></details>` : '';
   const src = sourcesGroupedHTML(e);
   if (chkFold || src) body += `<section class="deeper"><p>想深入再點開</p>${chkFold}${src}</section>`;
 
@@ -782,50 +789,39 @@ async function viewEvent(date, id){
   </div>`;
 }
 
-const STATUS_ORDER = CLAIM_MARKS.filter(k => k !== '💬');
+/* 查證頁：預設只看「查證結果」，追蹤中、久未舉證收進摺疊區；不做依人或政黨的篩選 */
+const RESOLVED = ['✅','❌','⚠','✂'];
+function claimCard(c){
+  const details = [
+    c.quote ? `<q>原話：${esc(c.quote)}</q>` : '',
+    `<dl>${c.party ? `<dt>身分</dt><dd>${esc(c.party)}</dd>` : ''}${c.saidOn ? `<dt>發言日期</dt><dd>${fmtShort(c.saidOn)}</dd>` : ''}${c.evidenceTypes.length ? `<dt>證據類型</dt><dd>${c.evidenceTypes.map(esc).join('、')}</dd>` : ''}${c.checkedOn ? `<dt>最後檢查</dt><dd>${fmtShort(c.checkedOn)}</dd>` : ''}</dl>`,
+    `<div class="links">${c.evidence.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">證據：${esc(hostOf(u))}</a>`).join('')}${c.events.map(e => `<a href="#e-${e.date}-${e.id}">相關新聞：${esc(e.title)}</a>`).join('')}</div>`
+  ].join('');
+  return `<article class="claim">
+    <div class="pills">${statusPill(c.status)}</div>
+    <h3>${esc(c.claim)}</h3>
+    <p class="who">${esc(c.speaker || '')}</p>
+    ${c.result ? `<p class="result">${esc(c.result)}</p>` : ''}
+    <details class="more"><summary>看證據與相關新聞</summary>${details}</details>
+  </article>`;
+}
+const miniClaim = c => `<li><b>${esc(c.claim)}</b><span>${esc(c.speaker || '')}${c.needs ? `・需要：${esc(c.needs)}` : ''}</span>${c.events[0] ? `<a href="#e-${c.events[0].date}-${c.events[0].id}">相關新聞 →</a>` : ''}</li>`;
 async function viewClaims(){
   const all = (await getClaims()).claims;
-  const f = state.cf;
-  const present = [...new Set(all.map(c => c.status).filter(Boolean))];
-  const rank = s => { const i = STATUS_ORDER.indexOf(markKey(s)); return i < 0 ? 99 : i; };
-  const statuses = ['全部', ...present.sort((a, b) => rank(a) - rank(b))];
-  const speakers = [...new Set(all.map(c => c.speaker).filter(Boolean))].sort();
-  const parties = [...new Set(all.map(c => c.party).filter(Boolean))].sort();
-  const list = all.filter(c => (f.status === '全部' || c.status === f.status) && (!f.speaker || c.speaker === f.speaker) && (!f.party || c.party === f.party));
-  const opt = (v, cur) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(v || '全部')}</option>`;
+  const by = k => all.filter(c => markKey(c.status) === k);
+  const resolved = all.filter(c => RESOLVED.includes(markKey(c.status)))
+    .sort((a, b) => (b.checkedOn || '').localeCompare(a.checkedOn || '') || (b.saidOn || '').localeCompare(a.saidOn || ''));
+  const pending = by('🔍').sort((a, b) => (b.saidOn || '').localeCompare(a.saidOn || ''));
+  const stale = by('🕐').sort((a, b) => (b.saidOn || '').localeCompare(a.saidOn || ''));
+  const fold = (title, list) => list.length ? `<details class="fold"><summary><span>${title}<small>${list.length} 條</small></span></summary><div class="inner"><ul class="minis">${list.map(miniClaim).join('')}</ul></div></details>` : '';
   return `
     <section style="display:flex;flex-direction:column;gap:6px">
-      <h1 class="h1">查證追蹤</h1>
-      <p class="date">每一條需要查證的說法和目前狀態。只呈現說法與證據，不做排行。</p>
-      <a class="morelink" href="#principles">標記是什麼意思？看「說明」頁 →</a>
+      <h1 class="h1">查證結果</h1>
+      <p class="date">爆料和指控後來查出了什麼。最新查出結果的排在最上面。</p>
     </section>
-    <section class="filters">
-      <div class="chips" aria-label="依狀態篩選">${statuses.map(s => {
-        const n = s === '全部' ? all.length : all.filter(c => c.status === s).length;
-        return `<button class="chip" data-cstatus="${esc(s)}" aria-pressed="${f.status === s}">${esc(s === '全部' ? s : labelOf(s))}<small>${n}</small></button>`; }).join('')}</div>
-      <div class="selects">
-        <label for="fSpeaker">發言者<select id="fSpeaker" data-cfield="speaker">${['', ...speakers].map(v => opt(v, f.speaker)).join('')}</select></label>
-        <label for="fParty">政黨／身分<select id="fParty" data-cfield="party">${['', ...parties].map(v => opt(v, f.party)).join('')}</select></label>
-      </div>
-    </section>
-    <section class="list">${list.map(c => `
-      <article class="claim">
-        <div class="pills">${statusPill(c.status) || '<span class="pill s-wait">未標示</span>'}${c.spread ? `<span class="pill line">擴散：${esc(c.spread)}</span>` : ''}</div>
-        <h3>${esc(c.claim)}</h3>
-        <p class="who">${esc(c.speaker || '')}${c.party ? ` · ${esc(c.party)}` : ''}${c.saidOn ? ` · ${fmtShort(c.saidOn)} 發言` : ''}</p>
-        ${c.quote ? `<q>原話：${esc(c.quote)}</q>` : ''}
-        <dl>
-          ${c.result ? `<dt>查證結果</dt><dd>${esc(c.result)}</dd>` : ''}
-          ${c.needs ? `<dt>需要的證據</dt><dd>${esc(c.needs)}</dd>` : ''}
-          ${c.burden ? `<dt>舉證責任</dt><dd>${esc(c.burden)}</dd>` : ''}
-          ${c.evidenceTypes.length ? `<dt>證據類型</dt><dd>${c.evidenceTypes.map(esc).join('、')}</dd>` : ''}
-          ${c.checkedOn ? `<dt>最後檢查</dt><dd>${fmtShort(c.checkedOn)}</dd>` : ''}
-        </dl>
-        <div class="links">
-          ${c.evidence.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(hostOf(u))}</a>`).join('')}
-          ${c.events.map(e => `<a href="#e-${e.date}-${e.id}">相關事件：${esc(e.title)}</a>`).join('')}
-        </div>
-      </article>`).join('') || '<p class="empty">沒有符合的說法。</p>'}</section>`;
+    <section class="list">${resolved.map(claimCard).join('') || '<p class="empty">目前還沒有查出結果的說法。</p>'}</section>
+    <section class="deeper">${fold('🔍 追蹤中', pending)}${fold('🕐 超過 30 天沒拿出證據', stale)}</section>
+    <a class="morelink" href="#principles">標記是什麼意思？看「說明」頁 →</a>`;
 }
 
 async function viewArchive(){
