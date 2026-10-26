@@ -326,6 +326,11 @@ figcaption{font-size:12px;color:var(--muted)}
 .minis li{display:flex;flex-direction:column;gap:3px;padding-block:10px;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.55}
 .minis li span{font-size:13px;color:var(--muted)}
 .minis li a{font-size:13px;align-self:flex-start;min-height:28px;display:inline-flex;align-items:center}
+.claim .gtitle{display:flex;flex-direction:column;gap:2px;text-decoration:none;font-size:16px;font-weight:700;line-height:1.5;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.claim .gtitle span{font-size:12.5px;font-weight:500;color:var(--muted)}
+.crow{display:flex;flex-direction:column;gap:6px;padding-block:6px}
+.crow + .crow{border-top:1px dashed var(--line);padding-top:12px}
+.crow h3{font-size:15.5px;line-height:1.55}
 </style>
 </head>
 <body>
@@ -795,17 +800,29 @@ function claimCard(c){
   const details = [
     c.quote ? `<q>原話：${esc(c.quote)}</q>` : '',
     `<dl>${c.party ? `<dt>身分</dt><dd>${esc(c.party)}</dd>` : ''}${c.saidOn ? `<dt>發言日期</dt><dd>${fmtShort(c.saidOn)}</dd>` : ''}${c.evidenceTypes.length ? `<dt>證據類型</dt><dd>${c.evidenceTypes.map(esc).join('、')}</dd>` : ''}${c.checkedOn ? `<dt>最後檢查</dt><dd>${fmtShort(c.checkedOn)}</dd>` : ''}</dl>`,
-    `<div class="links">${c.evidence.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">證據：${esc(hostOf(u))}</a>`).join('')}${c.events.map(e => `<a href="#e-${e.date}-${e.id}">相關新聞：${esc(e.title)}</a>`).join('')}</div>`
+    `<div class="links">${c.evidence.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">證據：${esc(hostOf(u))}</a>`).join('')}</div>`
   ].join('');
-  return `<article class="claim">
+  return `<div class="crow">
     <div class="pills">${statusPill(c.status)}</div>
     <h3>${esc(c.claim)}</h3>
     <p class="who">${esc(c.speaker || '')}</p>
     ${c.result ? `<p class="result">${esc(c.result)}</p>` : ''}
-    <details class="more"><summary>看證據與相關新聞</summary>${details}</details>
-  </article>`;
+    <details class="more"><summary>看證據</summary>${details}</details>
+  </div>`;
 }
 const miniClaim = c => `<li><b>${esc(c.claim)}</b><span>${esc(c.speaker || '')}${c.needs ? `・需要：${esc(c.needs)}` : ''}</span>${c.events[0] ? `<a href="#e-${c.events[0].date}-${c.events[0].id}">相關新聞 →</a>` : ''}</li>`;
+/* 依相關新聞分組（一條說法連到多則新聞時，歸到最近那則）；新聞依其中最新查出結果的時間排序 */
+function groupByNews(list){
+  const groups = new Map();
+  for (const c of list) {
+    const ev = [...c.events].sort((a, b) => (b.date || '').localeCompare(a.date || ''))[0] || null;
+    const key = ev ? ev.id : '_';
+    if (!groups.has(key)) groups.set(key, { ev, list: [] });
+    groups.get(key).list.push(c);
+  }
+  const latest = g => g.list.reduce((m, c) => (c.checkedOn || '') > m ? c.checkedOn : m, '');
+  return [...groups.values()].sort((a, b) => latest(b).localeCompare(latest(a)));
+}
 async function viewClaims(){
   const all = (await getClaims()).claims;
   const by = k => all.filter(c => markKey(c.status) === k);
@@ -819,7 +836,9 @@ async function viewClaims(){
       <h1 class="h1">查證結果</h1>
       <p class="date">爆料和指控後來查出了什麼。最新查出結果的排在最上面。</p>
     </section>
-    <section class="list">${resolved.map(claimCard).join('') || '<p class="empty">目前還沒有查出結果的說法。</p>'}</section>
+    <section class="list">${groupByNews(resolved).map(g => `<article class="claim">
+      ${g.ev ? `<a class="gtitle" href="#e-${g.ev.date}-${g.ev.id}"><span>${fmtShort(g.ev.date)} 的新聞</span>${esc(g.ev.title)}</a>` : '<p class="gtitle"><span>其他</span></p>'}
+      ${g.list.map(claimCard).join('')}</article>`).join('') || '<p class="empty">目前還沒有查出結果的說法。</p>'}</section>
     <section class="deeper">${fold('🔍 追蹤中', pending)}${fold('🕐 超過 30 天沒拿出證據', stale)}</section>
     <a class="morelink" href="#principles">標記是什麼意思？看「說明」頁 →</a>`;
 }
