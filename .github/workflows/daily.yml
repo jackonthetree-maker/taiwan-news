@@ -1,19 +1,19 @@
-name: 每日更新新聞
+name: 每日同步 Notion
 
 on:
   schedule:
-    - cron: "17 23 * * *"   # 台灣時間每天 07:17
+    - cron: "7 1,2 * * *"   # 台灣時間每天 09:07、10:07（Notion 約 9 點前寫完；第二次補抓晚到的資料）
   workflow_dispatch:         # 也可以在 Actions 頁面手動執行
 
 permissions:
   contents: write
 
 concurrency:
-  group: daily-update
+  group: daily-sync
   cancel-in-progress: false
 
 jobs:
-  update:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,12 +25,10 @@ jobs:
       - name: 安裝圖片處理套件
         run: pip install pillow
 
-      - name: 從 Notion 匯出
+      - name: 從 Notion 同步
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_NEWS_DB: ${{ secrets.NOTION_NEWS_DB }}
-          NOTION_DAYS_DB: ${{ secrets.NOTION_DAYS_DB }}
-        run: python scripts/export_notion.py
+        run: python scripts/sync_notion.py
 
       - name: 有變動就存回專案
         run: |
@@ -40,6 +38,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "沒有新資料。"
           else
-            git commit -m "每日更新 $(TZ=Asia/Taipei date +%F)"
+            git commit -m "每日同步 $(TZ=Asia/Taipei date +%F)"
             git push
           fi

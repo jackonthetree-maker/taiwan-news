@@ -5,373 +5,449 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
 <title>今日新聞彙整</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
 <style>
-/* 版面：單欄手機版，最寬 560px 置中；底部固定導覽 */
+/* 單欄手機版，最寬 600px 置中；底部固定導覽 */
 :root{
   --bg:#FFFFFF; --surface:#FFFFFF; --soft:#F5F5F2; --line:#E7E6E1;
-  --fg:#17181C; --fg2:#45474E; --muted:#62646B;
-  --ok:#2F6F43; --warn:#8A5A00; --hatch:rgba(23,24,28,.045); --illo:#EFEBE2; --illo-fg:#6A5F4A;
-  --c-pol-bg:#E2EAF8; --c-pol:#1F3B6E; --c-soc-bg:#F8E4DF; --c-soc:#7A2E1F;
-  --c-tec-bg:#E9E4F7; --c-tec:#3F2D78; --c-life-bg:#E1F0E3; --c-life:#1E5A2B;
-  --c-intl-bg:#F7EED2; --c-intl:#6B4E0A;
+  --fg:#17181C; --fg2:#3F4148; --muted:#62646B; --hatch:rgba(23,24,28,.045); --illo:#EFEBE2;
+  --cat-bg:#F0EFEA; --cat:#3F4148;
+  --ok-bg:#E3F1E6; --ok:#1E6235; --mid-bg:#FBF0D6; --mid:#7A5300; --bad-bg:#FBE3E0; --bad:#9A2A1E;
+  --wait-bg:#ECECEF; --wait:#4B4E57; --view-bg:#E5ECF6; --view:#2B4870; --cut-bg:#FBE8D8; --cut:#8A4310;
+  --green-bg:#E2F0E6; --green:#21603A; --blue-bg:#E2EAF7; --blue:#244C86;
   --sans:'Noto Sans TC',system-ui,-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;
   --serif:'Noto Serif TC','Songti TC','PMingLiU',serif;
+  padding-top:env(safe-area-inset-top,0px);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#141518; --surface:#1B1C20; --soft:#202126; --line:#2E2F35;
-  --fg:#F1F1EE; --fg2:#C9CACF; --muted:#9A9CA3;
-  --ok:#7CC690; --warn:#E3B45C; --hatch:rgba(255,255,255,.04); --illo:#2A2722; --illo-fg:#C9BC9F;
-  --c-pol-bg:#22304A; --c-pol:#BFD2F5; --c-soc-bg:#432823; --c-soc:#F3C4B9;
-  --c-tec-bg:#2F2847; --c-tec:#D4C9F5; --c-life-bg:#21362A; --c-life:#BFE3C8;
-  --c-intl-bg:#3D331A; --c-intl:#EED9A1; color-scheme:dark}}
+  --bg:#141518; --surface:#1B1C20; --soft:#212226; --line:#2F3036; --fg:#F1F1EE; --fg2:#D0D1D5; --muted:#A0A2A9;
+  --hatch:rgba(255,255,255,.04); --illo:#2A2722; --cat-bg:#26272C; --cat:#D0D1D5;
+  --ok-bg:#1F3627; --ok:#9AD6AC; --mid-bg:#3A3019; --mid:#EBC97A; --bad-bg:#43231F; --bad:#F2AEA4;
+  --wait-bg:#2A2B30; --wait:#C4C6CC; --view-bg:#22304A; --view:#B9CDEE; --cut-bg:#43301F; --cut:#F1BE90;
+  --green-bg:#1F3627; --green:#9AD6AC; --blue-bg:#22304A; --blue:#B9CDEE; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#141518; --surface:#1B1C20; --soft:#202126; --line:#2E2F35;
-  --fg:#F1F1EE; --fg2:#C9CACF; --muted:#9A9CA3;
-  --ok:#7CC690; --warn:#E3B45C; --hatch:rgba(255,255,255,.04); --illo:#2A2722; --illo-fg:#C9BC9F;
-  --c-pol-bg:#22304A; --c-pol:#BFD2F5; --c-soc-bg:#432823; --c-soc:#F3C4B9;
-  --c-tec-bg:#2F2847; --c-tec:#D4C9F5; --c-life-bg:#21362A; --c-life:#BFE3C8;
-  --c-intl-bg:#3D331A; --c-intl:#EED9A1; color-scheme:dark}
+  --bg:#141518; --surface:#1B1C20; --soft:#212226; --line:#2F3036; --fg:#F1F1EE; --fg2:#D0D1D5; --muted:#A0A2A9;
+  --hatch:rgba(255,255,255,.04); --illo:#2A2722; --cat-bg:#26272C; --cat:#D0D1D5;
+  --ok-bg:#1F3627; --ok:#9AD6AC; --mid-bg:#3A3019; --mid:#EBC97A; --bad-bg:#43231F; --bad:#F2AEA4;
+  --wait-bg:#2A2B30; --wait:#C4C6CC; --view-bg:#22304A; --view:#B9CDEE; --cut-bg:#43301F; --cut:#F1BE90;
+  --green-bg:#1F3627; --green:#9AD6AC; --blue-bg:#22304A; --blue:#B9CDEE; color-scheme:dark}
 
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.6}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 html,body{margin:0}
-:root{padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.65}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 img{max-width:100%}
-button{font:inherit;color:inherit}
+button,select{font:inherit;color:inherit}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--fg);outline-offset:2px;border-radius:8px}
 h1,h2,h3{text-wrap:balance;margin:0}
 p{margin:0}
 
-.app{max-width:560px;margin:0 auto;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+.app{max-width:600px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px}
-.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;background:none;border:0;padding:0;cursor:pointer}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;text-decoration:none}
 .brand i{width:11px;height:11px;border-radius:50%;background:var(--fg);display:inline-block}
-.iconbtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.iconbtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;flex:0 0 auto}
 .iconbtn svg{width:18px;height:18px}
-.iconbtn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
-.row{display:flex;gap:8px}
 
-.view{display:flex;flex-direction:column;gap:22px;padding-top:6px}
-.sample{font-size:12px;color:var(--muted);background:var(--soft);border-radius:10px;padding:8px 12px}
+.view{display:flex;flex-direction:column;gap:22px;padding-top:4px}
+.note{font-size:12.5px;color:var(--muted);background:var(--soft);border-radius:10px;padding:8px 12px}
 .date{font-size:13px;color:var(--muted)}
-.h1{font-family:var(--serif);font-size:28px;line-height:1.35;font-weight:700}
+.h1{font-family:var(--serif);font-size:27px;line-height:1.35;font-weight:700}
+.h2{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+.empty{padding:28px 8px;text-align:center;color:var(--muted);font-size:14px}
 
-.hero{position:relative;aspect-ratio:1/1;max-width:100%;border-radius:22px;overflow:hidden;background:var(--illo);background-image:repeating-linear-gradient(135deg,var(--hatch) 0 12px,transparent 12px 24px);display:flex;flex-direction:column;justify-content:space-between;padding:14px}
-.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.hero > *{position:relative}
-.tag{align-self:flex-start;font-size:12px;padding:4px 10px;border-radius:999px;background:var(--surface);color:var(--fg2);opacity:.94}
-.ph{color:var(--illo-fg);font-size:13px;text-align:center;align-self:center}
-.oneliner{background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
-.oneliner b{font-size:12px;color:var(--muted)}
-.oneliner span{font-size:15px;font-weight:500}
+.hero{border-radius:22px;overflow:hidden;background:var(--illo);aspect-ratio:1/1;max-width:100%}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+
+.top3{border:1px solid var(--line);border-radius:18px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px}
+.top3 ol{margin:0;padding:0;list-style:none;counter-reset:n;display:flex;flex-direction:column;gap:10px}
+.top3 li{counter-increment:n;display:grid;grid-template-columns:26px minmax(0,1fr);gap:6px;font-size:15.5px;line-height:1.65}
+.top3 li::before{content:counter(n);font-family:var(--serif);font-weight:700;font-size:18px;line-height:1.4;color:var(--muted)}
+.follow{background:var(--soft);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.follow ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14.5px}
 
 .chips{display:flex;gap:8px;overflow-x:auto;margin-inline:-16px;padding-inline:16px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;min-height:40px;padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip{flex:0 0 auto;min-height:40px;padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .chip small{font-size:12px;opacity:.7}
 .chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 
-.cat{display:inline-block;align-self:flex-start;font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:999px}
-.cat-政治{background:var(--c-pol-bg);color:var(--c-pol)}
-.cat-社會{background:var(--c-soc-bg);color:var(--c-soc)}
-.cat-科技{background:var(--c-tec-bg);color:var(--c-tec)}
-.cat-生活{background:var(--c-life-bg);color:var(--c-life)}
-.cat-國際{background:var(--c-intl-bg);color:var(--c-intl)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;white-space:nowrap;background:var(--cat-bg);color:var(--cat)}
+.pill.line{background:transparent;border:1px solid var(--line);color:var(--fg2)}
+.s-ok{background:var(--ok-bg);color:var(--ok)} .s-mid{background:var(--mid-bg);color:var(--mid)}
+.s-bad{background:var(--bad-bg);color:var(--bad)} .s-wait{background:var(--wait-bg);color:var(--wait)}
+.s-view{background:var(--view-bg);color:var(--view)} .s-cut{background:var(--cut-bg);color:var(--cut)}
+.l-green{background:var(--green-bg);color:var(--green)} .l-blue{background:var(--blue-bg);color:var(--blue)}
+.l-neutral{background:var(--wait-bg);color:var(--wait)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 
-.photo{background:var(--soft);background-image:repeating-linear-gradient(135deg,var(--hatch) 0 10px,transparent 10px 20px);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;overflow:hidden;max-width:100%}
-.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.list{display:flex;flex-direction:column;gap:12px}
+.card{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:18px;padding:14px;background:var(--surface);text-decoration:none}
+.card .main{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:12px;align-items:start}
+.card h3{font-size:16px;line-height:1.5;font-weight:700}
+.card p{font-size:14px;color:var(--fg2);line-height:1.7;margin-top:4px}
+.thumb{width:84px;height:84px;border-radius:12px;overflow:hidden;background:var(--soft);background-image:repeating-linear-gradient(135deg,var(--hatch) 0 8px,transparent 8px 16px);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)}
+.thumb img,.photo img{width:100%;height:100%;object-fit:cover;display:block}
+.tags{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tags .gap{color:var(--mid)}
 
-.feat{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--surface);cursor:pointer;text-align:left;padding:0;width:100%}
-.feat .photo{aspect-ratio:16/10}
-.feat .in{padding:16px 16px 18px;display:flex;flex-direction:column;gap:9px}
-.feat h2{font-family:var(--serif);font-size:21px;line-height:1.45}
-.feat p{font-size:14px;color:var(--fg2);line-height:1.75}
-.meta{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
-.meta .ok{color:var(--ok)} .meta .warn{color:var(--warn)}
-
-.list{display:flex;flex-direction:column;gap:10px}
-.item{display:flex;gap:13px;align-items:stretch;border:1px solid var(--line);border-radius:16px;padding:11px;background:var(--surface);cursor:pointer;text-align:left;width:100%}
-.item .photo{flex:0 0 96px;height:96px;border-radius:11px}
-.item .in{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:5px}
-.item h3{font-size:15px;line-height:1.5;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.item .meta{margin-top:auto;font-size:11.5px;gap:10px}
-.empty{padding:32px 8px;text-align:center;color:var(--muted);font-size:14px}
-.foot{font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
-
-/* 內頁 */
-.fig{margin:0;display:flex;flex-direction:column;gap:7px}
-.fig .photo{aspect-ratio:3/2;border-radius:18px}
-.fig figcaption{font-size:12px;color:var(--muted)}
-.ttl{font-family:var(--serif);font-size:25px;line-height:1.45;font-weight:700}
+.photo{aspect-ratio:3/2;border-radius:18px;overflow:hidden;background:var(--soft);background-image:repeating-linear-gradient(135deg,var(--hatch) 0 10px,transparent 10px 20px);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);max-width:100%}
+figure{margin:0;display:flex;flex-direction:column;gap:6px}
+figcaption{font-size:12px;color:var(--muted)}
+.ttl{font-family:var(--serif);font-size:24px;line-height:1.45;font-weight:700}
+.gapbox{font-size:13.5px;color:var(--mid);background:var(--mid-bg);border-radius:12px;padding:10px 12px}
 .sec{display:flex;flex-direction:column;gap:10px}
-.sec h2{font-size:17px;font-weight:700}
-.box{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--surface);display:flex;flex-direction:column;gap:10px}
-.box ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;line-height:1.75}
-.body p{font-size:16px;line-height:1.9;color:var(--fg2)}
-.side{border:1px solid var(--line);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:4px;background:var(--surface)}
-.side b{font-size:12px;color:var(--muted)}
-.side small{font-size:12px;color:var(--muted)}
-.check{background:var(--soft);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:4px}
-.check h2{font-size:15px}
-.check p{font-size:14px;color:var(--fg2);line-height:1.8}
-.srcs{display:flex;flex-wrap:wrap;gap:8px}
-.src{min-height:40px;padding:0 13px;border-radius:999px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font-size:14px;text-decoration:none;background:var(--surface)}
-.src svg{width:12px;height:12px;color:var(--muted)}
-.rel{display:flex;gap:12px;align-items:flex-start;min-height:44px;background:none;border:0;padding:0;text-align:left;cursor:pointer;width:100%}
-.rel span:first-child{flex:0 0 44px;font-size:12px;font-weight:700;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
-.primary{min-height:52px;border-radius:14px;border:0;background:var(--fg);color:var(--bg);font-size:15px;font-weight:500;cursor:pointer;width:100%}
+.sec > h2{font-size:17px;font-weight:700}
+.lead{background:var(--soft);border-radius:16px;padding:16px 18px;font-size:16px;line-height:1.8}
+.lead h2{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.rich{font-size:15.5px;line-height:1.85;color:var(--fg2);display:flex;flex-direction:column;gap:8px;min-width:0}
+.rich ul,.rich ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
+.rich li > ul,.rich li > ol{margin-top:7px}
+.rich b{color:var(--fg)}
+.rich a{text-underline-offset:3px;overflow-wrap:anywhere}
+.rich blockquote{margin:0;padding:10px 14px;background:var(--soft);border-radius:12px}
+.rich hr{border:0;border-top:1px solid var(--line);width:100%}
+.mark{margin-right:6px;vertical-align:1px}
+.rich.sides > ul{list-style:none;padding-left:0;gap:12px}
+.rich.sides > ul > li{border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.rich.sides > ul > li > ul{list-style:none;padding-left:0}
+.prior{display:flex;flex-direction:column}
+.prior a{display:flex;gap:12px;min-height:44px;align-items:flex-start;text-decoration:none;padding-block:8px;border-bottom:1px solid var(--line)}
+.prior a span:first-child{flex:0 0 44px;font-size:12.5px;font-weight:700;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
+.issue{font-size:13.5px;color:var(--muted)}
+.srcs{display:flex;flex-direction:column}
+.src{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-height:48px;padding-block:8px;border-bottom:1px solid var(--line);text-decoration:none}
+.src b{font-size:14.5px;display:block}
+.src span.t{font-size:13px;color:var(--muted);display:block}
+.legend{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 
-/* 分類、前情 */
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.catcard{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--surface);display:flex;flex-direction:column;gap:6px;text-align:left;cursor:pointer;min-height:96px}
-.catcard b{font-size:22px;font-variant-numeric:tabular-nums}
-.day{display:flex;flex-direction:column;gap:8px}
-.day h2{font-size:14px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.filters{display:flex;flex-direction:column;gap:10px}
+.selects{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.selects label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.selects select{min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 10px;font-size:14px;color:var(--fg);min-width:0}
+.claim{border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.claim h3{font-size:15.5px;line-height:1.55}
+.claim .who{font-size:12.5px;color:var(--muted)}
+.claim q{display:block;quotes:none;font-size:14px;background:var(--soft);border-radius:10px;padding:8px 12px;color:var(--fg2)}
+.claim dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;font-size:13.5px}
+.claim dt{color:var(--muted)} .claim dd{margin:0;color:var(--fg2)}
+.claim .links{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px}
+.claim .links a{overflow-wrap:anywhere}
 
-/* 底部導覽 */
+.day{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:14px;text-decoration:none}
+.day b{font-size:15px;font-variant-numeric:tabular-nums} .day > span{font-size:13px;color:var(--muted);flex:0 0 auto}
+.day p{font-size:13.5px;color:var(--fg2);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-top:8px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.nav div{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
-.nav button{min-height:50px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted);cursor:pointer}
-.nav button svg{width:22px;height:22px}
-.nav button[aria-current="page"]{color:var(--fg);font-weight:700}
+.nav div{max-width:600px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.nav a{min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted);text-decoration:none}
+.nav a svg{width:22px;height:22px}
+.nav a[aria-current="page"]{color:var(--fg);font-weight:700}
 @media (prefers-reduced-motion:no-preference){.view{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
 </style>
-
 </head>
 <body>
 <div class="app">
-  <header class="top">
-    <button class="brand" data-go="home" aria-label="回到今日新聞"><i></i><span id="siteName"></span></button>
-  </header>
-  <main id="view" class="view" aria-live="polite"></main>
+  <header class="top"><a class="brand" href="#today"><i></i><span id="siteName"></span></a></header>
+  <main id="view" class="view"><p class="empty">載入中…</p></main>
 </div>
 <nav class="nav" aria-label="主選單"><div id="nav"></div></nav>
 
 <script>
-/* ============================================================
-   設定
-   ============================================================ */
-const CONFIG = {
-  siteName: '[平台名稱]',
-  dataUrl: 'data/news.json'    // 每天由 GitHub Actions 從 Notion 匯出
-};
+const CONFIG = { siteName: '[平台名稱]' };
 
-/* ============================================================
-   資料格式：見 README.md 與 data/news.json
-   Day  { date, updatedAt, oneLiner, illustration:{url, alt} }
-   News { id, date, category, title, summary, keyPoints[], body[],
-          sides:[{label, text, source}], check:{status:'verified'|'partial', note},
-          sources:[{name, url}], photo:{url, caption, credit},
-          related:[id], readMin, featured }
-   ============================================================ */
-const CATEGORIES = ['政治','社會','科技','生活','國際'];
+/* ---------- 資料（由 scripts/sync_notion.py 每天產生） ---------- */
+const cache = {};
+async function getJSON(path){
+  if (cache[path]) return cache[path];
+  const r = await fetch(path + '?t=' + Math.floor(Date.now() / 600000));
+  if (!r.ok) throw new Error(path + ' ' + r.status);
+  return cache[path] = await r.json();
+}
+const getIndex = () => getJSON('data/index.json');
+const getDay = d => getJSON(`data/days/${d}.json`);
+const getClaims = () => getJSON('data/claims.json');
+const getPrinciples = () => getJSON('data/principles.json');
 
-/* 資料層：畫面只透過這裡拿資料 */
-const Data = {
-  db: null,
-  async load(){
-    const r = await fetch(CONFIG.dataUrl + '?t=' + Date.now());
-    if (!r.ok) throw new Error('news.json ' + r.status);
-    this.db = await r.json();
-  },
-  today(){ return [...this.db.days].sort((a,b)=>b.date.localeCompare(a.date))[0]; },
-  newsOn(date){ return this.db.news.filter(n => n.date === date); },
-  get(id){ return this.db.news.find(n => n.id === id); },
-  pastDays(){ const t = this.today().date; return this.db.days.filter(d => d.date !== t).sort((a,b)=>b.date.localeCompare(a.date)); }
-};
-
-/* 收藏：只存在這支手機 */
-const Saved = {
-  key:'saved-news',
-  all(){ try { return JSON.parse(localStorage.getItem(this.key) || '[]'); } catch(e){ return []; } },
-  has(id){ return this.all().includes(id); },
-  toggle(id){
-    const s = this.all(); const i = s.indexOf(id);
-    i >= 0 ? s.splice(i,1) : s.unshift(id);
-    try { localStorage.setItem(this.key, JSON.stringify(s)); } catch(e){}
-  }
-};
-
-/* ============================================================
-   畫面
-   ============================================================ */
-const state = { view:'home', id:null, cat:'全部' };
-const $view = document.getElementById('view');
+/* ---------- 小工具 ---------- */
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const WEEK = ['日','一','二','三','四','五','六'];
-const fmtDay = d => { const x = new Date(d+'T00:00:00'); return `${x.getMonth()+1} 月 ${x.getDate()} 日 星期${WEEK[x.getDay()]}`; };
-const fmtShort = d => { const x = new Date(d+'T00:00:00'); return `${x.getMonth()+1}/${x.getDate()}`; };
+const dt = d => new Date(d + 'T00:00:00');
+const fmtDay = d => { const x = dt(d); return `${x.getMonth()+1} 月 ${x.getDate()} 日 星期${WEEK[x.getDay()]}`; };
+const fmtShort = d => { const x = dt(d); return `${x.getMonth()+1}/${x.getDate()}`; };
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./,''); } catch(e){ return u; } };
+const pick = (map, s) => map[Object.keys(map).find(k => (s || '').startsWith(k))];
+
+const CHECK = { '✅':'s-ok', '⚖️':'s-mid', '❌':'s-bad', '⏳':'s-wait' };
+const CLAIM = { '🔍':'s-mid', '🕐':'s-wait', '✅':'s-ok', '❌':'s-bad', '✂️':'s-cut', '⚠️':'s-cut' };
+const checkCls = s => pick(CHECK, s) || 's-wait';
+const claimCls = s => pick(CLAIM, s) || 's-wait';
+/* 內文裡的說法標記：✅ 事實、🔍 待證據、💬 觀點 用不同顏色 */
+const MARKS = [['✅','事實','s-ok'],['🔍','待證據','s-mid'],['💬','觀點','s-view'],['⚠️','誤導','s-cut'],['❌','不實','s-bad'],['✂️','斷章取義','s-cut']];
+const LEAN = { green:['偏綠','l-green'], blue:['偏藍','l-blue'], neutral:['中立','l-neutral'] };
 
 const I = {
-  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
-  mark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
-  ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>',
-  img:'<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/></svg>',
-  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>',
-  cats:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>',
-  past:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>'
+  ext:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>',
+  today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>',
+  claims:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/><path d="M8.5 11l1.8 1.8 3.4-3.6"/></svg>',
+  archive:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
+  rules:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 4h12v16H6z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>'
 };
 
-const photo = (p, label='新聞照片') => p && p.url
-  ? `<img src="${esc(p.url)}" alt="${esc(p.caption)}" loading="lazy" data-fallback="${esc(label)}">`
-  : esc(label);
-const checkTag = n => n.check.status === 'verified'
-  ? '<span class="ok">✓ 已查證</span>' : '<span class="warn">部分待查證</span>';
-
-function itemRow(n){
-  return `<button class="item" data-open="${n.id}">
-    <div class="photo">${photo(n.photo)}</div>
-    <div class="in">
-      <span class="cat cat-${n.category}">${n.category}</span>
-      <h3>${esc(n.title)}</h3>
-      <div class="meta"><span>${n.sources.length} 家媒體</span>${checkTag(n)}</div>
-    </div>
-  </button>`;
-}
-
-function viewHome(){
-  const day = Data.today(); const all = Data.newsOn(day.date);
-  const feat = all.find(n => n.featured);
-  const rest = all.filter(n => n !== feat);
-  const show = state.cat === '全部' ? rest : all.filter(n => n.category === state.cat && n !== feat);
-  const showFeat = feat && (state.cat === '全部' || state.cat === feat.category);
-  const chips = ['全部', ...CATEGORIES].map(c => {
-    const count = c === '全部' ? all.length : all.filter(n => n.category === c).length;
-    if (!count) return '';
-    return `<button class="chip" data-cat="${c}" aria-pressed="${state.cat===c}">${c}<small>${count}</small></button>`;
+/* Notion 內文 → HTML */
+function runsHTML(rs){
+  return (rs || []).map(r => {
+    let h = esc(r.x);
+    if (r.b) h = `<b>${h}</b>`;
+    if (r.i) h = `<i>${h}</i>`;
+    if (r.a) h = `<a href="${esc(r.a)}" target="_blank" rel="noopener">${h}</a>`;
+    return h;
   }).join('');
-  return `
-    ${Data.db.sample ? '<p class="sample">目前顯示範例資料，尚未連接 Notion。</p>' : ''}
-    <section style="display:flex;flex-direction:column;gap:4px">
-      <p class="date">${fmtDay(day.date)} · ${esc(day.updatedAt)} 更新</p>
-      <h1 class="h1">早安，今天有 ${all.length} 件事值得知道</h1>
-    </section>
-    <section class="hero" aria-label="今日插畫">
-      ${day.illustration.url ? `<img src="${esc(day.illustration.url)}" alt="${esc(day.illustration.alt)}">` : ''}
-      <span class="tag">AI 插畫 · 每日依新聞生成</span>
-      ${day.illustration.url ? '<span></span>' : `<div class="ph">${I.img}<div>[每日插畫 1:1]</div></div>`}
-      ${day.oneLiner ? `<div class="oneliner"><b>今日一句話</b><span>${esc(day.oneLiner)}</span></div>` : '<span></span>'}
-    </section>
-    <section class="chips" aria-label="新聞分類">${chips}</section>
-    ${showFeat ? `
-      <button class="feat" data-open="${feat.id}">
-        <div class="photo">${photo(feat.photo, '新聞照片 · [來源媒體]')}</div>
-        <div class="in">
-          <div class="row" style="align-items:center"><span class="cat cat-${feat.category}">${feat.category}</span><span class="date" style="font-size:12px">今日頭條</span></div>
-          <h2>${esc(feat.title)}</h2>
-          <p>${esc(feat.summary)}</p>
-          <div class="meta"><span>${feat.sources.length} 家媒體</span>${checkTag(feat)}<span>${feat.readMin} 分鐘</span></div>
-        </div>
-      </button>` : ''}
-    <section class="list" aria-label="新聞列表">
-      ${show.length ? show.map(itemRow).join('') : (showFeat ? '' : '<p class="empty">今天這個分類沒有新聞。</p>')}
-    </section>
-    <p class="foot">每則新聞經多家媒體交叉比對 · 首頁插畫為 AI 生成<br>新聞照片取自實際報導並標示來源</p>`;
+}
+function withMark(rs){
+  const first = rs && rs[0] ? rs[0].x : '';
+  const m = MARKS.find(([e]) => first.startsWith(e));
+  if (!m) return runsHTML(rs);
+  const rest = [{ ...rs[0], x: first.slice(m[0].length).trimStart() }, ...rs.slice(1)];
+  return `<span class="pill mark ${m[2]}">${m[1]}</span>` + runsHTML(rest);
+}
+function nodesHTML(nodes){
+  let html = '', i = 0;
+  while (i < nodes.length){
+    const n = nodes[i];
+    if (n.t === 'li' || n.t === 'ol'){
+      const tag = n.t === 'li' ? 'ul' : 'ol'; let items = '';
+      while (i < nodes.length && nodes[i].t === n.t){
+        const m = nodes[i++];
+        items += `<li>${withMark(m.r)}${m.c ? nodesHTML(m.c) : ''}</li>`;
+      }
+      html += `<${tag}>${items}</${tag}>`; continue;
+    }
+    i++;
+    if (n.t === 'hr') html += '<hr>';
+    else if (n.t === 'h3') html += `<h3 style="font-size:15px">${runsHTML(n.r)}</h3>`;
+    else if (n.t === 'quote' || n.t === 'callout') html += `<blockquote>${withMark(n.r)}${n.c ? nodesHTML(n.c) : ''}</blockquote>`;
+    else html += `<p>${withMark(n.r)}</p>${n.c ? nodesHTML(n.c) : ''}`;
+  }
+  return html;
 }
 
-function viewArticle(){
-  const n = Data.get(state.id);
-  if (!n) return '<p class="empty">找不到這則新聞。</p>';
-  const today = Data.newsOn(Data.today().date);
-  const idx = today.findIndex(x => x.id === n.id);
-  const next = idx >= 0 ? today[(idx+1) % today.length] : null;
-  const rel = n.related.map(id => Data.get(id)).filter(Boolean);
-  const saved = Saved.has(n.id);
-  return `
-    <div class="row" style="justify-content:space-between">
-      <button class="iconbtn" data-go="home" aria-label="回到今日新聞">${I.back}</button>
-      <button class="iconbtn" data-save="${n.id}" aria-pressed="${saved}" aria-label="${saved ? '取消收藏' : '收藏這則新聞'}">${I.mark}</button>
+const img = (url, label, alt) => url
+  ? `<img src="${esc(url)}" alt="${esc(alt || '')}" loading="lazy" data-fallback="${esc(label)}">` : esc(label);
+const statusPills = e => `
+  ${e.category ? `<span class="pill">${esc(e.category)}</span>` : ''}
+  ${e.check ? `<span class="pill ${checkCls(e.check)}">${esc(e.check)}</span>` : ''}
+  ${e.nature ? `<span class="pill line">${esc(e.nature)}</span>` : ''}`;
+
+/* ---------- 畫面 ---------- */
+const state = { cat:'全部', cf:{ status:'全部', speaker:'', party:'' } };
+const $view = document.getElementById('view');
+
+function eventCard(e){
+  const tags = [];
+  if (e.mediaCount != null) tags.push(`<span>比對 ${e.mediaCount} 家</span>`);
+  if (e.independentCount != null) tags.push(`<span>獨立來源 ${e.independentCount}</span>`);
+  if (e.gap) tags.push(`<span class="gap">立場缺口：${esc(e.gap)}</span>`);
+  return `<a class="card" href="#e-${e.date}-${e.id}">
+    <div class="pills">${statusPills(e)}</div>
+    <div class="main">
+      <div style="min-width:0"><h3>${esc(e.title)}</h3>${e.summary ? `<p>${esc(e.summary)}</p>` : ''}</div>
+      <div class="thumb">${img(e.photo && e.photo.url, '照片', e.title)}</div>
     </div>
-    <figure class="fig">
-      <div class="photo">${photo(n.photo, '實際新聞照片 · 3:2')}</div>
-      <figcaption>${esc(n.photo.caption)} · 來源：${esc(n.photo.credit)}</figcaption>
-    </figure>
-    <section style="display:flex;flex-direction:column;gap:10px">
-      <span class="cat cat-${n.category}">${n.category}</span>
-      <h1 class="ttl">${esc(n.title)}</h1>
-      <div class="meta"><span>${fmtShort(n.date)}</span><span>${n.sources.length} 家媒體報導</span>${checkTag(n)}<span>${n.readMin} 分鐘</span></div>
+    ${tags.length ? `<div class="tags">${tags.join('')}</div>` : ''}
+  </a>`;
+}
+
+async function viewDay(date, isToday){
+  const idx = await getIndex();
+  if (!date) date = idx.latest;
+  if (!date) return '<p class="empty">還沒有新聞資料。</p>';
+  const d = await getDay(date);
+  const cats = ['全部', ...new Set(d.events.map(e => e.category).filter(Boolean))];
+  if (!cats.includes(state.cat)) state.cat = '全部';
+  const shown = state.cat === '全部' ? d.events : d.events.filter(e => e.category === state.cat);
+  return `
+    ${idx.preview ? '<p class="note">預覽資料：每日自動同步還沒開始。</p>' : ''}
+    ${isToday ? '' : `<a class="iconbtn" href="#archive" aria-label="回到歸檔">${I.back}</a>`}
+    <section style="display:flex;flex-direction:column;gap:4px">
+      <p class="date">${fmtDay(d.date)}${d.coverage ? ` · 涵蓋 ${esc(d.coverage)}` : ''}</p>
+      <h1 class="h1">${isToday ? `今天有 ${d.events.length} 件事值得知道` : `${fmtShort(d.date)} 的 ${d.events.length} 件事`}</h1>
     </section>
-    <section class="box"><h2 style="font-size:17px">三個重點</h2><ol>${n.keyPoints.map(k=>`<li>${esc(k)}</li>`).join('')}</ol></section>
-    <section class="sec body"><h2>事件經過</h2>${n.body.map(p=>`<p>${esc(p)}</p>`).join('')}</section>
-    ${n.sides.length ? `<section class="sec"><h2>各方說法</h2>${n.sides.map(s=>`
-      <div class="side"><b>${esc(s.label)}</b><p>${esc(s.text)}</p><small>出處：${esc(s.source)}</small></div>`).join('')}</section>` : ''}
-    <section class="check"><h2 style="color:var(${n.check.status==='verified'?'--ok':'--warn'})">${n.check.status==='verified'?'✓ 查證說明':'待查證說明'}</h2><p>${esc(n.check.note)}</p></section>
-    <section class="sec"><h2>報導來源（${n.sources.length}）</h2>
-      <div class="srcs">${n.sources.map(s=>`<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}${I.ext}</a>`).join('')}</div></section>
-    ${rel.length ? `<section class="box"><h2 style="font-size:17px">相關前情</h2>
-      ${rel.map(r=>`<button class="rel" data-open="${r.id}"><span>${fmtShort(r.date)}</span><span>${esc(r.title)}</span></button>`).join('')}</section>` : ''}
-    ${next && next.id !== n.id ? `<button class="primary" data-open="${next.id}">下一則：${esc(next.title.slice(0,14))}…</button>` : ''}`;
+    ${d.illustration ? `<div class="hero">${img(d.illustration, '', '今日插畫')}</div>` : ''}
+    ${d.top3 && d.top3.length ? `<section class="top3"><h2 class="h2">${isToday ? '今日三件重點' : '當日三件重點'}</h2><ol>${d.top3.map(t => `<li><span>${esc(t)}</span></li>`).join('')}</ol></section>` : ''}
+    ${d.followUps && d.followUps.length ? `<section class="follow"><h2 class="h2">📌 追蹤更新</h2><ul>${d.followUps.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>` : ''}
+    <section class="chips" aria-label="依類別篩選">${cats.map(c => {
+      const n = c === '全部' ? d.events.length : d.events.filter(e => e.category === c).length;
+      return `<button class="chip" data-cat="${esc(c)}" aria-pressed="${state.cat === c}">${esc(c)}<small>${n}</small></button>`;
+    }).join('')}</section>
+    <section class="list" aria-label="事件列表">${shown.map(eventCard).join('') || '<p class="empty">這個類別沒有事件。</p>'}</section>`;
 }
 
-function viewCats(){
-  const all = Data.newsOn(Data.today().date);
-  return `<h1 class="h1">分類</h1>
-    <div class="grid">${CATEGORIES.map(c => {
-      const k = all.filter(n=>n.category===c).length;
-      return `<button class="catcard" data-pickcat="${c}"><span class="cat cat-${c}">${c}</span><b>${k}</b><span class="date">今日則數</span></button>`;
-    }).join('')}</div>`;
+function claimsMini(list){
+  return `<section class="sec"><h2>這則事件的查證追蹤</h2>${list.map(c => `
+    <div class="claim"><div class="pills"><span class="pill ${claimCls(c.status)}">${esc(c.status)}</span></div>
+      <h3>${esc(c.claim)}</h3><p class="who">${esc(c.speaker || '')}${c.party ? ` · ${esc(c.party)}` : ''}</p>
+      ${c.needs && (c.status || '').startsWith('🔍') ? `<p class="who">需要的證據：${esc(c.needs)}${c.burden ? `（舉證：${esc(c.burden)}）` : ''}</p>` : ''}
+    </div>`).join('')}<a class="chip" style="align-self:flex-start" href="#claims">看全部查證追蹤</a></section>`;
 }
 
-function viewPast(){
-  const days = Data.pastDays();
-  return `<h1 class="h1">前情回顧</h1>
-    ${days.map(d => { const ns = Data.newsOn(d.date); return ns.length ? `
-      <section class="day"><h2>${fmtDay(d.date)}</h2><div class="list">${ns.map(itemRow).join('')}</div></section>` : ''; }).join('')
-      || '<p class="empty">還沒有過去的新聞。</p>'}`;
+async function viewEvent(date, id){
+  const d = await getDay(date);
+  const e = d.events.find(x => x.id === id);
+  if (!e) return '<p class="empty">找不到這則事件。</p>';
+  let claims = [];
+  try { claims = (await getClaims()).claims.filter(c => e.claims.includes(c.id)); } catch(err){}
+  const secs = e.sections || [];
+  const get = t => secs.find(s => s.title.startsWith(t));
+  const ORDER = ['一句話看懂','已確認的事實','各方說法','各家報導的差異','查證說明','看完你可以怎麼想'];
+  const lead = get('一句話看懂');
+  let body = `<section class="lead"><h2>一句話看懂</h2>${lead ? `<div class="rich">${nodesHTML(lead.body)}</div>` : `<p>${esc(e.summary || '')}</p>`}</section>`;
+  for (const t of ORDER.slice(1)){
+    const s = get(t);
+    if (s && s.body.length) body += `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich${t === '各方說法' ? ' sides' : ''}">${nodesHTML(s.body)}</div></section>`;
+    if (t === '查證說明' && claims.length) body += claimsMini(claims);
+  }
+  for (const s of secs) if (![...ORDER, '前情', '來源'].some(o => s.title.startsWith(o)))
+    body += `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`;
+  if (!secs.length) body += '<p class="note">完整內文整理中。</p>';
+
+  const prior = get('前情');
+  if (prior || e.prior.length || e.issues.length){
+    body += `<section class="sec"><h2>前情</h2>
+      ${e.issues.map(i => `<p class="issue">議題：${esc(i.name)}${i.background ? `｜${esc(i.background)}` : ''}</p>`).join('')}
+      ${prior ? `<div class="rich">${nodesHTML(prior.body)}</div>` : ''}
+      ${e.prior.length ? `<div class="prior">${e.prior.map(p => `<a href="#d-${p.date}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}
+    </section>`;
+  }
+  if (e.sources.length){
+    body += `<section class="sec"><h2>來源（${e.sources.length}）</h2>
+      <p class="legend">媒體立場依一般認知標示：<span class="pill l-green">偏綠</span><span class="pill l-blue">偏藍</span><span class="pill l-neutral">中立</span></p>
+      <div class="srcs">${e.sources.map(s => { const l = LEAN[s.lean];
+        return `<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener"><span style="min-width:0"><b>${esc(s.name)}</b><span class="t">${esc(s.title || hostOf(s.url))}</span></span>
+          <span class="pills">${l ? `<span class="pill ${l[1]}">${l[0]}</span>` : ''}${I.ext}</span></a>`; }).join('')}</div></section>`;
+  }
+  const meta = [fmtShort(e.date)];
+  if (e.mediaCount != null) meta.push(`比對 ${e.mediaCount} 家`);
+  if (e.independentCount != null) meta.push(`獨立來源 ${e.independentCount}`);
+  const p = e.photo || {};
+  return `
+    <a class="iconbtn" href="#d-${e.date}" aria-label="回到 ${fmtShort(e.date)} 的事件列表">${I.back}</a>
+    <figure><div class="photo">${img(p.url, '新聞照片', e.title)}</div>
+      ${p.credit ? `<figcaption>照片：${esc(p.credit)}${p.source ? ` · <a href="${esc(p.source)}" target="_blank" rel="noopener">原文</a>` : ''}</figcaption>` : ''}</figure>
+    <section style="display:flex;flex-direction:column;gap:10px">
+      <div class="pills">${statusPills(e)}</div>
+      <h1 class="ttl">${esc(e.title)}</h1>
+      <p class="tags">${meta.map(m => `<span>${m}</span>`).join('')}</p>
+      ${e.gap ? `<p class="gapbox">立場缺口：${esc(e.gap)}</p>` : ''}
+    </section>
+    ${body}`;
 }
 
-function viewSaved(){
-  const ns = Saved.all().map(id => Data.get(id)).filter(Boolean);
-  return `<h1 class="h1">收藏</h1>
-    ${ns.length ? `<div class="list">${ns.map(itemRow).join('')}</div>`
-      : '<p class="empty">還沒有收藏。在新聞內頁點右上角的書籤就會出現在這裡。</p>'}`;
+const STATUS_ORDER = ['🔍 待證據','🕐 久未舉證','✅ 已證實','❌ 不實','✂️ 斷章取義','⚠️ 部分正確'];
+async function viewClaims(){
+  const all = (await getClaims()).claims;
+  const f = state.cf;
+  const present = [...new Set(all.map(c => c.status).filter(Boolean))];
+  const statuses = ['全部', ...STATUS_ORDER.filter(s => present.includes(s)), ...present.filter(s => !STATUS_ORDER.includes(s))];
+  const speakers = [...new Set(all.map(c => c.speaker).filter(Boolean))].sort();
+  const parties = [...new Set(all.map(c => c.party).filter(Boolean))].sort();
+  const list = all.filter(c => (f.status === '全部' || c.status === f.status) && (!f.speaker || c.speaker === f.speaker) && (!f.party || c.party === f.party));
+  const opt = (v, cur) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(v || '全部')}</option>`;
+  return `
+    <section style="display:flex;flex-direction:column;gap:6px">
+      <h1 class="h1">查證追蹤</h1>
+      <p class="date">每一條需要查證的說法和目前狀態。只呈現說法與證據，不做排行。</p>
+    </section>
+    <section class="filters">
+      <div class="chips" aria-label="依狀態篩選">${statuses.map(s => {
+        const n = s === '全部' ? all.length : all.filter(c => c.status === s).length;
+        return `<button class="chip" data-cstatus="${esc(s)}" aria-pressed="${f.status === s}">${esc(s)}<small>${n}</small></button>`; }).join('')}</div>
+      <div class="selects">
+        <label for="fSpeaker">發言者<select id="fSpeaker" data-cfield="speaker">${['', ...speakers].map(v => opt(v, f.speaker)).join('')}</select></label>
+        <label for="fParty">政黨／身分<select id="fParty" data-cfield="party">${['', ...parties].map(v => opt(v, f.party)).join('')}</select></label>
+      </div>
+    </section>
+    <section class="list">${list.map(c => `
+      <article class="claim">
+        <div class="pills"><span class="pill ${claimCls(c.status)}">${esc(c.status || '未標示')}</span>${c.spread ? `<span class="pill line">擴散：${esc(c.spread)}</span>` : ''}</div>
+        <h3>${esc(c.claim)}</h3>
+        <p class="who">${esc(c.speaker || '')}${c.party ? ` · ${esc(c.party)}` : ''}${c.saidOn ? ` · ${fmtShort(c.saidOn)} 發言` : ''}</p>
+        ${c.quote ? `<q>原話：${esc(c.quote)}</q>` : ''}
+        <dl>
+          ${c.result ? `<dt>查證結果</dt><dd>${esc(c.result)}</dd>` : ''}
+          ${c.needs ? `<dt>需要的證據</dt><dd>${esc(c.needs)}</dd>` : ''}
+          ${c.burden ? `<dt>舉證責任</dt><dd>${esc(c.burden)}</dd>` : ''}
+          ${c.evidenceTypes.length ? `<dt>證據類型</dt><dd>${c.evidenceTypes.map(esc).join('、')}</dd>` : ''}
+          ${c.checkedOn ? `<dt>最後檢查</dt><dd>${fmtShort(c.checkedOn)}</dd>` : ''}
+        </dl>
+        <div class="links">
+          ${c.evidence.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(hostOf(u))}</a>`).join('')}
+          ${c.events.map(e => `<a href="#e-${e.date}-${e.id}">相關事件：${esc(e.title)}</a>`).join('')}
+        </div>
+      </article>`).join('') || '<p class="empty">沒有符合的說法。</p>'}</section>`;
 }
 
-const NAV = [['home','今日',I.home],['cats','分類',I.cats],['past','前情',I.past],['saved','收藏',I.mark]];
-function render(){
-  const v = { home:viewHome, article:viewArticle, cats:viewCats, past:viewPast, saved:viewSaved }[state.view];
-  $view.innerHTML = v();
-  const navOn = state.view === 'article' ? 'home' : state.view;
+async function viewArchive(){
+  const idx = await getIndex();
+  return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">歷史歸檔</h1><p class="date">一天一頁，點日期看當天的全部事件。</p></section>
+    <section class="list">${idx.days.map(d => `
+      <a class="day" href="#d-${d.date}"><div style="min-width:0"><b>${fmtDay(d.date)}</b><p>${esc(d.lead || '')}</p></div><span>${d.count} 則</span></a>`).join('')
+      || '<p class="empty">還沒有歸檔。</p>'}</section>`;
+}
+
+async function viewPrinciples(){
+  const p = await getPrinciples();
+  return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">編輯原則</h1><p class="date">這個平台怎麼比對、怎麼分類。</p></section>
+    ${p.sections.map(s => `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`).join('')}`;
+}
+
+/* ---------- 網址：#today、#d-日期、#e-日期-ID、#claims、#archive、#principles ---------- */
+const NAV = [['today','今日',I.today],['claims','查證',I.claims],['archive','歸檔',I.archive],['principles','原則',I.rules]];
+let lastRoute = '';
+async function route(){
+  const h = location.hash.slice(1) || 'today';
+  let tab = 'today', html, m;
+  try {
+    if ((m = h.match(/^e-(\d{4}-\d{2}-\d{2})-([0-9a-f]+)$/))) { tab = m[1] === (await getIndex()).latest ? 'today' : 'archive'; html = await viewEvent(m[1], m[2]); }
+    else if ((m = h.match(/^d-(\d{4}-\d{2}-\d{2})$/))) { const t = m[1] === (await getIndex()).latest; tab = t ? 'today' : 'archive'; html = await viewDay(m[1], t); }
+    else if (h === 'claims') { tab = 'claims'; html = await viewClaims(); }
+    else if (h === 'archive') { tab = 'archive'; html = await viewArchive(); }
+    else if (h === 'principles') { tab = 'principles'; html = await viewPrinciples(); }
+    else html = await viewDay(null, true);
+  } catch(err){
+    console.error(err);
+    html = '<p class="empty">資料載入失敗，請稍後重新整理。</p>';
+  }
+  $view.innerHTML = html;
   document.getElementById('nav').innerHTML = NAV.map(([k,l,ic]) =>
-    `<button data-go="${k}" ${k===navOn?'aria-current="page"':''}>${ic}${l}</button>`).join('');
+    `<a href="#${k}" ${k === tab ? 'aria-current="page"' : ''}>${ic}${l}</a>`).join('');
+  if (h !== lastRoute) window.scrollTo(0, 0);
+  lastRoute = h;
 }
-function go(view, id){ state.view = view; state.id = id || null; render(); window.scrollTo(0,0); }
 
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-open],[data-go],[data-cat],[data-save],[data-pickcat]');
+  const t = e.target.closest('[data-cat],[data-cstatus]');
   if (!t) return;
-  if (t.dataset.open) go('article', t.dataset.open);
-  else if (t.dataset.go) go(t.dataset.go);
-  else if (t.dataset.cat) { state.cat = t.dataset.cat; render(); }
-  else if (t.dataset.pickcat) { state.cat = t.dataset.pickcat; go('home'); }
-  else if (t.dataset.save) { Saved.toggle(t.dataset.save); render(); }
+  if (t.dataset.cat) state.cat = t.dataset.cat; else state.cf.status = t.dataset.cstatus;
+  route();
 });
-
-/* 照片載不到時改顯示佔位文字 */
+document.addEventListener('change', e => {
+  const f = e.target.dataset && e.target.dataset.cfield;
+  if (f) { state.cf[f] = e.target.value; route(); }
+});
 document.addEventListener('error', e => {
-  const img = e.target;
-  if (img.tagName !== 'IMG') return;
-  if (img.closest('.hero')) { img.remove(); return; }
-  if (img.dataset.fallback !== undefined) {
-    const box = img.parentElement; box.textContent = img.dataset.fallback;
-  }
+  const el = e.target;
+  if (el.tagName !== 'IMG') return;
+  if (el.closest('.hero')) { el.closest('.hero').remove(); return; }
+  if (el.dataset.fallback !== undefined) el.parentElement.textContent = el.dataset.fallback;
 }, true);
+window.addEventListener('hashchange', route);
 
-(async () => {
-  document.getElementById('siteName').textContent = CONFIG.siteName;
-  try { await Data.load(); }
-  catch(e){ $view.innerHTML = '<p class="empty">今天的新聞還沒載入成功，請稍後重新整理。</p>'; return; }
-  const h = location.hash.slice(1);
-  if (h && Data.get(h)) { state.view = 'article'; state.id = h; }
-  else if (['cats','past','saved'].includes(h)) state.view = h;
-  render();
-})();
+document.getElementById('siteName').textContent = CONFIG.siteName;
+route();
 </script>
 </body>
 </html>
