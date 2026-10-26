@@ -819,7 +819,9 @@ function legendSection(){
 }
 async function viewPrinciples(){
   const p = await getPrinciples();
-  const secs = p.sections.filter(s => s.title !== '說法分類');
+  const fixRule3 = s => s.title !== '編輯原則' ? s : { ...s, body: s.body.map(n => /^\s*查證狀態/.test(runsText(n.r))
+    ? { t: n.t, r: [{ x: '查證狀態', b: 1 }, { x: '：每則事件最上面標示整體的查證程度，每一句說法也各有標記，意思見下方「標記說明」。' }] } : n) };
+  const secs = p.sections.filter(s => s.title !== '說法分類').map(fixRule3);
   const first = secs.findIndex(s => s.title === '編輯原則');
   const parts = secs.map(s => `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`);
   parts.splice(first < 0 ? 0 : first + 1, 0, legendSection(), `<section class="sec"><h2>排列順序</h2><div class="rich">
