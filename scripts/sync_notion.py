@@ -137,11 +137,6 @@ def lines(text):
     return [l.strip() for l in (text or "").splitlines() if l.strip()]
 
 
-def split_numbered(text):
-    """「1. aaa 2. bbb 3. ccc」或一行一點 → 清單"""
-    parts = [p.strip() for p in re.split(r"(?:^|(?<=[\n。；;！？]))\s*\d{1,2}[.、．](?!\d)\s*", text or "") if p.strip()]
-    return parts if len(parts) > 1 else lines(text)
-
 
 # ---------- 內文區塊 → 網頁用格式 ----------
 # 節點：{"t": 類型, "r": [文字片段], "c": [子節點]}
@@ -391,13 +386,12 @@ def build(api, save_images=True):
             "title": prop(d, "日期標題"),
             "coverage": prop(d, "涵蓋時段"),
             "status": prop(d, "執行狀態"),
-            "top3": split_numbered(prop(d, "今日三件重點"))[:3],
             "followUps": lines(prop(d, "追蹤更新"))[:MAX_FOLLOWUPS],
             "illustration": (save_image(illo, ILLOS / f"{date}.webp") if (illo and save_images) else ""),
             "events": evs,
         }
         write(DATA / "days" / f"{date}.json", day)
-        index_days.append({"date": date, "title": day["title"], "count": len(evs), "lead": (day["top3"] or [e["title"] for e in evs] or [""])[0]})
+        index_days.append({"date": date, "title": day["title"], "count": len(evs), "lead": evs[0]["title"] if evs else ""})
 
     index_days.sort(key=lambda x: x["date"], reverse=True)
 
