@@ -270,6 +270,10 @@ figcaption{font-size:12px;color:var(--muted)}
 .srcgroup a b{display:block;font-size:13px;color:var(--muted);font-weight:500}
 .srcnote{font-size:13px;color:var(--muted);line-height:1.6}
 .say .by{font-size:12.5px;color:var(--muted);margin-top:-2px}
+.summary .think{display:block;border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0 0}
+.summary .rich,.summary .think .rich{font-size:16.5px;line-height:1.75;color:var(--fg)}
+.summary h2,.summary .think h2{font-size:13px !important;color:var(--muted);font-weight:700;margin:0 0 4px}
+.series{align-self:flex-start;font-size:12.5px;color:var(--fg2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
 </style>
 </head>
 <body>
@@ -669,7 +673,7 @@ async function viewEvent(date, id){
   /* 第二層：發生了什麼、誰怎麼說 */
   const prior = get('前情');
   if (prior || e.prior.length || e.issues.length) body += sec('前情', `
-    ${e.issues.map(i => `<p class="issue">議題：${esc(i.name)}${i.background ? `｜${esc(i.background)}` : ''}</p>`).join('')}
+    ${e.issues.map(i => `<span class="series">系列：${esc(i.name)}</span>`).join('')}
     ${prior ? `<div class="rich">${nodesHTML(prior.body)}</div>` : ''}
     ${e.prior.length ? `<div class="prior">${e.prior.map(p => `<a href="#d-${p.date}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}`, 'bg');
   const facts = get('已確認的事實');
