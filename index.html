@@ -162,7 +162,7 @@ const CONFIG = { siteName: '[平台名稱]' };
 const cache = {};
 async function getJSON(path){
   if (cache[path]) return cache[path];
-  const r = await fetch(path + '?t=' + Math.floor(Date.now() / 600000));
+  const r = await fetch(path, { cache: 'no-cache' });   // 每次都向伺服器確認有沒有新版本
   if (!r.ok) throw new Error(path + ' ' + r.status);
   return cache[path] = await r.json();
 }
