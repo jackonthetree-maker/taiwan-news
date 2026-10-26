@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<title>今日新聞彙整</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap">
+<style>
+/* 版面：單欄手機版，最寬 560px 置中；底部固定導覽 */
+:root{
+  --bg:#FFFFFF; --surface:#FFFFFF; --soft:#F5F5F2; --line:#E7E6E1;
+  --fg:#17181C; --fg2:#45474E; --muted:#62646B;
+  --ok:#2F6F43; --warn:#8A5A00; --hatch:rgba(23,24,28,.045); --illo:#EFEBE2; --illo-fg:#6A5F4A;
+  --c-pol-bg:#E2EAF8; --c-pol:#1F3B6E; --c-soc-bg:#F8E4DF; --c-soc:#7A2E1F;
+  --c-tec-bg:#E9E4F7; --c-tec:#3F2D78; --c-life-bg:#E1F0E3; --c-life:#1E5A2B;
+  --c-intl-bg:#F7EED2; --c-intl:#6B4E0A;
+  --sans:'Noto Sans TC',system-ui,-apple-system,'PingFang TC','Microsoft JhengHei',sans-serif;
+  --serif:'Noto Serif TC','Songti TC','PMingLiU',serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141518; --surface:#1B1C20; --soft:#202126; --line:#2E2F35;
+  --fg:#F1F1EE; --fg2:#C9CACF; --muted:#9A9CA3;
+  --ok:#7CC690; --warn:#E3B45C; --hatch:rgba(255,255,255,.04); --illo:#2A2722; --illo-fg:#C9BC9F;
+  --c-pol-bg:#22304A; --c-pol:#BFD2F5; --c-soc-bg:#432823; --c-soc:#F3C4B9;
+  --c-tec-bg:#2F2847; --c-tec:#D4C9F5; --c-life-bg:#21362A; --c-life:#BFE3C8;
+  --c-intl-bg:#3D331A; --c-intl:#EED9A1; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141518; --surface:#1B1C20; --soft:#202126; --line:#2E2F35;
+  --fg:#F1F1EE; --fg2:#C9CACF; --muted:#9A9CA3;
+  --ok:#7CC690; --warn:#E3B45C; --hatch:rgba(255,255,255,.04); --illo:#2A2722; --illo-fg:#C9BC9F;
+  --c-pol-bg:#22304A; --c-pol:#BFD2F5; --c-soc-bg:#432823; --c-soc:#F3C4B9;
+  --c-tec-bg:#2F2847; --c-tec:#D4C9F5; --c-life-bg:#21362A; --c-life:#BFE3C8;
+  --c-intl-bg:#3D331A; --c-intl:#EED9A1; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+html,body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px)}
+img{max-width:100%}
+button{font:inherit;color:inherit}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--fg);outline-offset:2px;border-radius:8px}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+
+.app{max-width:560px;margin:0 auto;min-height:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;background:none;border:0;padding:0;cursor:pointer}
+.brand i{width:11px;height:11px;border-radius:50%;background:var(--fg);display:inline-block}
+.iconbtn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.iconbtn svg{width:18px;height:18px}
+.iconbtn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.row{display:flex;gap:8px}
+
+.view{display:flex;flex-direction:column;gap:22px;padding-top:6px}
+.sample{font-size:12px;color:var(--muted);background:var(--soft);border-radius:10px;padding:8px 12px}
+.date{font-size:13px;color:var(--muted)}
+.h1{font-family:var(--serif);font-size:28px;line-height:1.35;font-weight:700}
+
+.hero{position:relative;aspect-ratio:1/1;max-width:100%;border-radius:22px;overflow:hidden;background:var(--illo);background-image:repeating-linear-gradient(135deg,var(--hatch) 0 12px,transparent 12px 24px);display:flex;flex-direction:column;justify-content:space-between;padding:14px}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero > *{position:relative}
+.tag{align-self:flex-start;font-size:12px;padding:4px 10px;border-radius:999px;background:var(--surface);color:var(--fg2);opacity:.94}
+.ph{color:var(--illo-fg);font-size:13px;text-align:center;align-self:center}
+.oneliner{background:var(--surface);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.oneliner b{font-size:12px;color:var(--muted)}
+.oneliner span{font-size:15px;font-weight:500}
+
+.chips{display:flex;gap:8px;overflow-x:auto;margin-inline:-16px;padding-inline:16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;min-height:40px;padding:8px 15px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:14px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip small{font-size:12px;opacity:.7}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+.cat{display:inline-block;align-self:flex-start;font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:999px}
+.cat-政治{background:var(--c-pol-bg);color:var(--c-pol)}
+.cat-社會{background:var(--c-soc-bg);color:var(--c-soc)}
+.cat-科技{background:var(--c-tec-bg);color:var(--c-tec)}
+.cat-生活{background:var(--c-life-bg);color:var(--c-life)}
+.cat-國際{background:var(--c-intl-bg);color:var(--c-intl)}
+
+.photo{background:var(--soft);background-image:repeating-linear-gradient(135deg,var(--hatch) 0 10px,transparent 10px 20px);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:12px;overflow:hidden;max-width:100%}
+.photo img{width:100%;height:100%;object-fit:cover;display:block}
+
+.feat{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--surface);cursor:pointer;text-align:left;padding:0;width:100%}
+.feat .photo{aspect-ratio:16/10}
+.feat .in{padding:16px 16px 18px;display:flex;flex-direction:column;gap:9px}
+.feat h2{font-family:var(--serif);font-size:21px;line-height:1.45}
+.feat p{font-size:14px;color:var(--fg2);line-height:1.75}
+.meta{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted)}
+.meta .ok{color:var(--ok)} .meta .warn{color:var(--warn)}
+
+.list{display:flex;flex-direction:column;gap:10px}
+.item{display:flex;gap:13px;align-items:stretch;border:1px solid var(--line);border-radius:16px;padding:11px;background:var(--surface);cursor:pointer;text-align:left;width:100%}
+.item .photo{flex:0 0 96px;height:96px;border-radius:11px}
+.item .in{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:5px}
+.item h3{font-size:15px;line-height:1.5;font-weight:700;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.item .meta{margin-top:auto;font-size:11.5px;gap:10px}
+.empty{padding:32px 8px;text-align:center;color:var(--muted);font-size:14px}
+.foot{font-size:12px;color:var(--muted);text-align:center;line-height:1.7}
+
+/* 內頁 */
+.fig{margin:0;display:flex;flex-direction:column;gap:7px}
+.fig .photo{aspect-ratio:3/2;border-radius:18px}
+.fig figcaption{font-size:12px;color:var(--muted)}
+.ttl{font-family:var(--serif);font-size:25px;line-height:1.45;font-weight:700}
+.sec{display:flex;flex-direction:column;gap:10px}
+.sec h2{font-size:17px;font-weight:700}
+.box{border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--surface);display:flex;flex-direction:column;gap:10px}
+.box ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;line-height:1.75}
+.body p{font-size:16px;line-height:1.9;color:var(--fg2)}
+.side{border:1px solid var(--line);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:4px;background:var(--surface)}
+.side b{font-size:12px;color:var(--muted)}
+.side small{font-size:12px;color:var(--muted)}
+.check{background:var(--soft);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:4px}
+.check h2{font-size:15px}
+.check p{font-size:14px;color:var(--fg2);line-height:1.8}
+.srcs{display:flex;flex-wrap:wrap;gap:8px}
+.src{min-height:40px;padding:0 13px;border-radius:999px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font-size:14px;text-decoration:none;background:var(--surface)}
+.src svg{width:12px;height:12px;color:var(--muted)}
+.rel{display:flex;gap:12px;align-items:flex-start;min-height:44px;background:none;border:0;padding:0;text-align:left;cursor:pointer;width:100%}
+.rel span:first-child{flex:0 0 44px;font-size:12px;font-weight:700;color:var(--muted);padding-top:2px;font-variant-numeric:tabular-nums}
+.primary{min-height:52px;border-radius:14px;border:0;background:var(--fg);color:var(--bg);font-size:15px;font-weight:500;cursor:pointer;width:100%}
+
+/* 分類、前情 */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.catcard{border:1px solid var(--line);border-radius:16px;padding:16px;background:var(--surface);display:flex;flex-direction:column;gap:6px;text-align:left;cursor:pointer;min-height:96px}
+.catcard b{font-size:22px;font-variant-numeric:tabular-nums}
+.day{display:flex;flex-direction:column;gap:8px}
+.day h2{font-size:14px;color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+
+/* 底部導覽 */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-top:8px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.nav div{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.nav button{min-height:50px;border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted);cursor:pointer}
+.nav button svg{width:22px;height:22px}
+.nav button[aria-current="page"]{color:var(--fg);font-weight:700}
+@media (prefers-reduced-motion:no-preference){.view{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <button class="brand" data-go="home" aria-label="回到今日新聞"><i></i><span id="siteName"></span></button>
+  </header>
+  <main id="view" class="view" aria-live="polite"></main>
+</div>
+<nav class="nav" aria-label="主選單"><div id="nav"></div></nav>
+
+<script>
+/* ============================================================
+   設定
+   ============================================================ */
+const CONFIG = {
+  siteName: '[平台名稱]',
+  dataUrl: 'data/news.json'    // 每天由 GitHub Actions 從 Notion 匯出
+};
+
+/* ============================================================
+   資料格式：見 README.md 與 data/news.json
+   Day  { date, updatedAt, oneLiner, illustration:{url, alt} }
+   News { id, date, category, title, summary, keyPoints[], body[],
+          sides:[{label, text, source}], check:{status:'verified'|'partial', note},
+          sources:[{name, url}], photo:{url, caption, credit},
+          related:[id], readMin, featured }
+   ============================================================ */
+const CATEGORIES = ['政治','社會','科技','生活','國際'];
+
+/* 資料層：畫面只透過這裡拿資料 */
+const Data = {
+  db: null,
+  async load(){
+    const r = await fetch(CONFIG.dataUrl + '?t=' + Date.now());
+    if (!r.ok) throw new Error('news.json ' + r.status);
+    this.db = await r.json();
+  },
+  today(){ return [...this.db.days].sort((a,b)=>b.date.localeCompare(a.date))[0]; },
+  newsOn(date){ return this.db.news.filter(n => n.date === date); },
+  get(id){ return this.db.news.find(n => n.id === id); },
+  pastDays(){ const t = this.today().date; return this.db.days.filter(d => d.date !== t).sort((a,b)=>b.date.localeCompare(a.date)); }
+};
+
+/* 收藏：只存在這支手機 */
+const Saved = {
+  key:'saved-news',
+  all(){ try { return JSON.parse(localStorage.getItem(this.key) || '[]'); } catch(e){ return []; } },
+  has(id){ return this.all().includes(id); },
+  toggle(id){
+    const s = this.all(); const i = s.indexOf(id);
+    i >= 0 ? s.splice(i,1) : s.unshift(id);
+    try { localStorage.setItem(this.key, JSON.stringify(s)); } catch(e){}
+  }
+};
+
+/* ============================================================
+   畫面
+   ============================================================ */
+const state = { view:'home', id:null, cat:'全部' };
+const $view = document.getElementById('view');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const WEEK = ['日','一','二','三','四','五','六'];
+const fmtDay = d => { const x = new Date(d+'T00:00:00'); return `${x.getMonth()+1} 月 ${x.getDate()} 日 星期${WEEK[x.getDay()]}`; };
+const fmtShort = d => { const x = new Date(d+'T00:00:00'); return `${x.getMonth()+1}/${x.getDate()}`; };
+
+const I = {
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  mark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+  ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>',
+  img:'<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-8 9"/></svg>',
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>',
+  cats:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>',
+  past:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>'
+};
+
+const photo = (p, label='新聞照片') => p && p.url
+  ? `<img src="${esc(p.url)}" alt="${esc(p.caption)}" loading="lazy" data-fallback="${esc(label)}">`
+  : esc(label);
+const checkTag = n => n.check.status === 'verified'
+  ? '<span class="ok">✓ 已查證</span>' : '<span class="warn">部分待查證</span>';
+
+function itemRow(n){
+  return `<button class="item" data-open="${n.id}">
+    <div class="photo">${photo(n.photo)}</div>
+    <div class="in">
+      <span class="cat cat-${n.category}">${n.category}</span>
+      <h3>${esc(n.title)}</h3>
+      <div class="meta"><span>${n.sources.length} 家媒體</span>${checkTag(n)}</div>
+    </div>
+  </button>`;
+}
+
+function viewHome(){
+  const day = Data.today(); const all = Data.newsOn(day.date);
+  const feat = all.find(n => n.featured);
+  const rest = all.filter(n => n !== feat);
+  const show = state.cat === '全部' ? rest : all.filter(n => n.category === state.cat && n !== feat);
+  const showFeat = feat && (state.cat === '全部' || state.cat === feat.category);
+  const chips = ['全部', ...CATEGORIES].map(c => {
+    const count = c === '全部' ? all.length : all.filter(n => n.category === c).length;
+    if (!count) return '';
+    return `<button class="chip" data-cat="${c}" aria-pressed="${state.cat===c}">${c}<small>${count}</small></button>`;
+  }).join('');
+  return `
+    ${Data.db.sample ? '<p class="sample">目前顯示範例資料，尚未連接 Notion。</p>' : ''}
+    <section style="display:flex;flex-direction:column;gap:4px">
+      <p class="date">${fmtDay(day.date)} · ${esc(day.updatedAt)} 更新</p>
+      <h1 class="h1">早安，今天有 ${all.length} 件事值得知道</h1>
+    </section>
+    <section class="hero" aria-label="今日插畫">
+      ${day.illustration.url ? `<img src="${esc(day.illustration.url)}" alt="${esc(day.illustration.alt)}">` : ''}
+      <span class="tag">AI 插畫 · 每日依新聞生成</span>
+      ${day.illustration.url ? '<span></span>' : `<div class="ph">${I.img}<div>[每日插畫 1:1]</div></div>`}
+      ${day.oneLiner ? `<div class="oneliner"><b>今日一句話</b><span>${esc(day.oneLiner)}</span></div>` : '<span></span>'}
+    </section>
+    <section class="chips" aria-label="新聞分類">${chips}</section>
+    ${showFeat ? `
+      <button class="feat" data-open="${feat.id}">
+        <div class="photo">${photo(feat.photo, '新聞照片 · [來源媒體]')}</div>
+        <div class="in">
+          <div class="row" style="align-items:center"><span class="cat cat-${feat.category}">${feat.category}</span><span class="date" style="font-size:12px">今日頭條</span></div>
+          <h2>${esc(feat.title)}</h2>
+          <p>${esc(feat.summary)}</p>
+          <div class="meta"><span>${feat.sources.length} 家媒體</span>${checkTag(feat)}<span>${feat.readMin} 分鐘</span></div>
+        </div>
+      </button>` : ''}
+    <section class="list" aria-label="新聞列表">
+      ${show.length ? show.map(itemRow).join('') : (showFeat ? '' : '<p class="empty">今天這個分類沒有新聞。</p>')}
+    </section>
+    <p class="foot">每則新聞經多家媒體交叉比對 · 首頁插畫為 AI 生成<br>新聞照片取自實際報導並標示來源</p>`;
+}
+
+function viewArticle(){
+  const n = Data.get(state.id);
+  if (!n) return '<p class="empty">找不到這則新聞。</p>';
+  const today = Data.newsOn(Data.today().date);
+  const idx = today.findIndex(x => x.id === n.id);
+  const next = idx >= 0 ? today[(idx+1) % today.length] : null;
+  const rel = n.related.map(id => Data.get(id)).filter(Boolean);
+  const saved = Saved.has(n.id);
+  return `
+    <div class="row" style="justify-content:space-between">
+      <button class="iconbtn" data-go="home" aria-label="回到今日新聞">${I.back}</button>
+      <button class="iconbtn" data-save="${n.id}" aria-pressed="${saved}" aria-label="${saved ? '取消收藏' : '收藏這則新聞'}">${I.mark}</button>
+    </div>
+    <figure class="fig">
+      <div class="photo">${photo(n.photo, '實際新聞照片 · 3:2')}</div>
+      <figcaption>${esc(n.photo.caption)} · 來源：${esc(n.photo.credit)}</figcaption>
+    </figure>
+    <section style="display:flex;flex-direction:column;gap:10px">
+      <span class="cat cat-${n.category}">${n.category}</span>
+      <h1 class="ttl">${esc(n.title)}</h1>
+      <div class="meta"><span>${fmtShort(n.date)}</span><span>${n.sources.length} 家媒體報導</span>${checkTag(n)}<span>${n.readMin} 分鐘</span></div>
+    </section>
+    <section class="box"><h2 style="font-size:17px">三個重點</h2><ol>${n.keyPoints.map(k=>`<li>${esc(k)}</li>`).join('')}</ol></section>
+    <section class="sec body"><h2>事件經過</h2>${n.body.map(p=>`<p>${esc(p)}</p>`).join('')}</section>
+    ${n.sides.length ? `<section class="sec"><h2>各方說法</h2>${n.sides.map(s=>`
+      <div class="side"><b>${esc(s.label)}</b><p>${esc(s.text)}</p><small>出處：${esc(s.source)}</small></div>`).join('')}</section>` : ''}
+    <section class="check"><h2 style="color:var(${n.check.status==='verified'?'--ok':'--warn'})">${n.check.status==='verified'?'✓ 查證說明':'待查證說明'}</h2><p>${esc(n.check.note)}</p></section>
+    <section class="sec"><h2>報導來源（${n.sources.length}）</h2>
+      <div class="srcs">${n.sources.map(s=>`<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}${I.ext}</a>`).join('')}</div></section>
+    ${rel.length ? `<section class="box"><h2 style="font-size:17px">相關前情</h2>
+      ${rel.map(r=>`<button class="rel" data-open="${r.id}"><span>${fmtShort(r.date)}</span><span>${esc(r.title)}</span></button>`).join('')}</section>` : ''}
+    ${next && next.id !== n.id ? `<button class="primary" data-open="${next.id}">下一則：${esc(next.title.slice(0,14))}…</button>` : ''}`;
+}
+
+function viewCats(){
+  const all = Data.newsOn(Data.today().date);
+  return `<h1 class="h1">分類</h1>
+    <div class="grid">${CATEGORIES.map(c => {
+      const k = all.filter(n=>n.category===c).length;
+      return `<button class="catcard" data-pickcat="${c}"><span class="cat cat-${c}">${c}</span><b>${k}</b><span class="date">今日則數</span></button>`;
+    }).join('')}</div>`;
+}
+
+function viewPast(){
+  const days = Data.pastDays();
+  return `<h1 class="h1">前情回顧</h1>
+    ${days.map(d => { const ns = Data.newsOn(d.date); return ns.length ? `
+      <section class="day"><h2>${fmtDay(d.date)}</h2><div class="list">${ns.map(itemRow).join('')}</div></section>` : ''; }).join('')
+      || '<p class="empty">還沒有過去的新聞。</p>'}`;
+}
+
+function viewSaved(){
+  const ns = Saved.all().map(id => Data.get(id)).filter(Boolean);
+  return `<h1 class="h1">收藏</h1>
+    ${ns.length ? `<div class="list">${ns.map(itemRow).join('')}</div>`
+      : '<p class="empty">還沒有收藏。在新聞內頁點右上角的書籤就會出現在這裡。</p>'}`;
+}
+
+const NAV = [['home','今日',I.home],['cats','分類',I.cats],['past','前情',I.past],['saved','收藏',I.mark]];
+function render(){
+  const v = { home:viewHome, article:viewArticle, cats:viewCats, past:viewPast, saved:viewSaved }[state.view];
+  $view.innerHTML = v();
+  const navOn = state.view === 'article' ? 'home' : state.view;
+  document.getElementById('nav').innerHTML = NAV.map(([k,l,ic]) =>
+    `<button data-go="${k}" ${k===navOn?'aria-current="page"':''}>${ic}${l}</button>`).join('');
+}
+function go(view, id){ state.view = view; state.id = id || null; render(); window.scrollTo(0,0); }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-open],[data-go],[data-cat],[data-save],[data-pickcat]');
+  if (!t) return;
+  if (t.dataset.open) go('article', t.dataset.open);
+  else if (t.dataset.go) go(t.dataset.go);
+  else if (t.dataset.cat) { state.cat = t.dataset.cat; render(); }
+  else if (t.dataset.pickcat) { state.cat = t.dataset.pickcat; go('home'); }
+  else if (t.dataset.save) { Saved.toggle(t.dataset.save); render(); }
+});
+
+/* 照片載不到時改顯示佔位文字 */
+document.addEventListener('error', e => {
+  const img = e.target;
+  if (img.tagName !== 'IMG') return;
+  if (img.closest('.hero')) { img.remove(); return; }
+  if (img.dataset.fallback !== undefined) {
+    const box = img.parentElement; box.textContent = img.dataset.fallback;
+  }
+}, true);
+
+(async () => {
+  document.getElementById('siteName').textContent = CONFIG.siteName;
+  try { await Data.load(); }
+  catch(e){ $view.innerHTML = '<p class="empty">今天的新聞還沒載入成功，請稍後重新整理。</p>'; return; }
+  const h = location.hash.slice(1);
+  if (h && Data.get(h)) { state.view = 'article'; state.id = h; }
+  else if (['cats','past','saved'].includes(h)) state.view = h;
+  render();
+})();
+</script>
+</body>
+</html>
