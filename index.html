@@ -817,35 +817,37 @@ async function viewArchive(){
       || '<p class="empty">還沒有歸檔。</p>'}</section>`;
 }
 
-function legendSection(){
-  const dl = (keys, ev) => `<dl>${keys.map(k => { const [e, l, c, d] = (ev && EVENT_LABEL[k]) || LABELS[k]; return `<dt><span class="pill ${c}">${e} ${l}</span></dt><dd>${esc(d)}</dd>`; }).join('')}</dl>`;
-  return `<section class="sec"><h2>標記說明</h2><div class="legend2">
-    <div>${dl(['✅','❌','⚖','⏳','🔍','💬','⚠','✂','🕐'])}
-      <p class="date" style="margin-top:8px">文章最上面的標記是整則事件的總結，例如「✅ 經過已證實」表示事件經過（誰、何時、做了什麼）已證實；文章裡每一句說法另外各有標記。</p></div>
-    <div><h3>內容性質</h3><dl>${NATURE_TYPES.map(([, e, l, d]) => `<dt><span class="pill line">${e} ${l}</span></dt><dd>${esc(d)}</dd>`).join('')}</dl>
-      <p class="date" style="margin-top:8px">每則選一個主要性質，有需要時再加一個次要性質，例如「🗣️ 爭議＋⚔️ 選戰」。</p></div>
-    <div><h3>媒體立場</h3><dl>
-      <dt><span class="pill l-green">偏綠</span></dt><dd>一般認為立場較接近民進黨的媒體</dd>
-      <dt><span class="pill l-blue">偏藍</span></dt><dd>一般認為立場較接近國民黨的媒體</dd>
-      <dt><span class="pill l-neutral">中立</span></dt><dd>通訊社、公共媒體等作為比對基準的媒體</dd></dl>
-      <p class="date" style="margin-top:8px">每則新聞會分開搜尋各立場的媒體。「比對 7 家媒體，其中 6 家自己採訪」的意思是：7 家有報導，但有 1 家只是轉載別家的稿子，所以實際只算 6 個來源。</p></div>
-  </div></section>`;
-}
+/* 原則頁：網頁精簡版（Notion 主頁保留完整編輯規範） */
 async function viewPrinciples(){
-  const p = await getPrinciples();
-  const fixRule3 = s => s.title !== '編輯原則' ? s : { ...s, body: s.body.map(n => /^\s*查證狀態/.test(runsText(n.r))
-    ? { t: n.t, r: [{ x: '查證狀態', b: 1 }, { x: '：每則事件最上面標示整體的查證程度，每一句說法也各有標記，意思見下方「標記說明」。' }] } : n) };
-  const secs = p.sections.filter(s => s.title !== '說法分類').map(fixRule3);
-  const first = secs.findIndex(s => s.title === '編輯原則');
-  const parts = secs.map(s => `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`);
-  parts.splice(first < 0 ? 0 : first + 1, 0, legendSection(), `<section class="sec"><h2>排列順序</h2><div class="rich">
-    <p>每個分類裡的新聞依固定規則排列，不另外由人工挑選「重點」：</p>
-    <ol><li>先看主要性質：📌 政策 → 📊 數字 → 🗣️ 爭議 → ⚔️ 選戰（次要性質不影響排序）</li>
-    <li>主要性質相同時，查證越確定越前面：✅ 經過已證實 → ❌ 有誤 → ⚖️ 各說各話 → ⏳ 待確認</li>
-    <li>以上都相同時，依編輯排定的順序。</li></ol>
-    <p>不依報導家數排列：報導多寡反映的是媒體的關注度，不等於對讀者的重要性。</p></div></section>`);
-  return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">編輯原則</h1><p class="date">這個平台怎麼比對、怎麼分類。</p></section>
-    ${parts.join('')}`;
+  const dl = rows => `<dl>${rows.join('')}</dl>`;
+  const markRows = ['✅','❌','⚖','⏳','🔍','💬','⚠','✂','🕐'].map(k => { const [e, l, c, d] = LABELS[k]; return `<dt><span class="pill ${c}">${e} ${l}</span></dt><dd>${esc(d)}</dd>`; });
+  const natureRows = NATURE_TYPES.map(([, e, l, d]) => `<dt><span class="pill line">${e} ${l}</span></dt><dd>${esc(d)}</dd>`);
+  const sec = (t, inner) => `<section class="sec"><h2>${t}</h2>${inner}</section>`;
+  return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">原則</h1>
+      <p class="date">每天整理台灣的重要新聞，比對不同立場的媒體、對照一手資料，說明實際發生了什麼。</p></section>
+    ${sec('我們怎麼做', `<div class="rich"><ul>
+      <li>每則政治新聞至少比對偏綠、偏藍、中立各一家媒體；找不到某一方時，會在文章裡註明。</li>
+      <li>事實和說法分開寫：有一手資料或多家各自採訪證實的才算事實，其餘都寫成「某某表示」。</li>
+      <li>多家轉載同一篇稿子，只算一個來源。</li>
+      <li>查不到的不下結論，不讀付費牆內容。</li>
+      <li>每則都附原文連結，可以自己點回去看。</li></ul></div>`)}
+    ${sec('標記說明', `<div class="legend2"><div>${dl(markRows)}
+      <p class="date" style="margin-top:8px">文章最上面的標記是整則事件的總結，例如「✅ 經過已證實」表示事件經過已證實；文章裡每一句說法另外各有標記。</p></div></div>`)}
+    ${sec('內容性質', `<div class="legend2"><div>${dl(natureRows)}
+      <p class="date" style="margin-top:8px">每則選一個主要性質，需要時再加一個次要性質，例如「🗣️ 爭議＋⚔️ 選戰」。</p></div></div>`)}
+    ${sec('排列順序', `<div class="rich"><p>每個分類裡的新聞依固定規則排列，不由人工挑選重點：</p><ol>
+      <li>主要性質：📌 政策 → 📊 數字 → 🗣️ 爭議 → ⚔️ 選戰</li>
+      <li>查證狀態：✅ 已證實 → ❌ 有誤 → ⚖️ 各說各話 → ⏳ 待確認</li>
+      <li>以上都相同時，依編輯排定的順序</li></ol>
+      <p>不依報導家數排列：報導多寡反映的是媒體關注度，不等於對讀者的重要性。</p></div>`)}
+    ${sec('媒體立場', `<div class="legend2"><div><dl>
+      <dt><span class="pill l-green">偏綠</span></dt><dd>一般認為立場較接近民進黨</dd>
+      <dt><span class="pill l-blue">偏藍</span></dt><dd>一般認為立場較接近國民黨</dd>
+      <dt><span class="pill l-neutral">中立</span></dt><dd>通訊社、公共媒體等，作為比對基準</dd></dl></div></div>`)}
+    ${sec('爆料怎麼處理', `<div class="rich"><ul>
+      <li>爆料一律先標 🔍 待證據，有查核報告、原始文件、官方數據、判決或完整影音才改標記。</li>
+      <li>藍、綠、白、政府、媒體都用同一套標準，不幫任何人貼「常造謠」之類的標籤。</li>
+      <li>沒什麼人在傳的不實說法不收，避免反而幫忙擴散。</li></ul></div>`)}`;
 }
 
 /* ---------- 網址：#today、#d-日期、#e-日期-ID、#claims、#archive、#principles ---------- */
