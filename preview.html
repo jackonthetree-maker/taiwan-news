@@ -300,6 +300,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .card.hl .pills{padding-right:72px}
 .star{position:absolute;top:14px;right:14px;background:var(--fg);color:var(--bg);font-weight:700}
 .daybar{margin-top:6px}
+.rich ol{padding-left:30px}
 </style>
 </head>
 <body>
@@ -393,7 +394,8 @@ function withMark(rs){
   const first = rs && rs[0] ? rs[0].x : '';
   const m = first.match(MARK_RE);
   if (!m) return runsHTML(rs);
-  const rest = [{ ...rs[0], x: first.slice(m[0].length) }, ...rs.slice(1)];
+  const after = first.slice(m[0].length).replace(/^(已證實|事實|屬實|各說各話|報導有誤|有誤|不實|待確認|待證據|觀點|誤導|部分正確|斷章取義|久未舉證)\s*[：:]\s*/, '');
+  const rest = [{ ...rs[0], x: after }, ...rs.slice(1)];
   return `${statusPill(m[1])} ` + runsHTML(rest);
 }
 function nodesHTML(nodes){
@@ -447,7 +449,7 @@ function eventCard(e){
   tags.push(`<span class="covmini" aria-label="偏綠 ${cv.green.length} 家、中立 ${cv.neutral.length} 家、偏藍 ${cv.blue.length} 家">${
     [['green','g','綠'],['neutral','n','中'],['blue','b','藍']].map(([k, c, l]) => `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('')}</span>`);
   return `<a class="card" href="#e-${e.date}-${e.id}">
-    <div class="pills">${statusPills(e, true)}</div>
+    <div class="pills">${e.nature ? `<span class="pill line">${esc(NATURE[e.nature] || e.nature)}</span>` : ''}</div>
     <div class="main">
       <div style="min-width:0"><h3>${esc(e.title)}</h3>${e.summary ? `<p>${esc(e.summary)}</p>` : ''}</div>
       <div class="thumb">${img(e.photo && e.photo.url, '照片', e.title)}</div>
@@ -806,8 +808,8 @@ async function viewArchive(){
 function legendSection(){
   const dl = (keys, ev) => `<dl>${keys.map(k => { const [e, l, c, d] = (ev && EVENT_LABEL[k]) || LABELS[k]; return `<dt><span class="pill ${c}">${e} ${l}</span></dt><dd>${esc(d)}</dd>`; }).join('')}</dl>`;
   return `<section class="sec"><h2>標記說明</h2><div class="legend2">
-    <div><h3>整則事件的查證狀態</h3>${dl(EVENT_MARKS, true)}</div>
-    <div><h3>單一說法的標記</h3>${dl(CLAIM_MARKS)}</div>
+    <div>${dl(['✅','❌','⚖','⏳','🔍','💬','⚠','✂','🕐'])}
+      <p class="date" style="margin-top:8px">文章最上面的標記是整則事件的總結，例如「✅ 經過已證實」表示事件經過（誰、何時、做了什麼）已證實；文章裡每一句說法另外各有標記。</p></div>
     <div><h3>媒體立場</h3><dl>
       <dt><span class="pill l-green">偏綠</span></dt><dd>一般認為立場較接近民進黨的媒體</dd>
       <dt><span class="pill l-blue">偏藍</span></dt><dd>一般認為立場較接近國民黨的媒體</dd>
