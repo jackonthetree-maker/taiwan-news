@@ -300,6 +300,25 @@ figcaption{font-size:12px;color:var(--muted)}
 .star{position:absolute;top:14px;right:14px;background:var(--fg);color:var(--bg);font-weight:700}
 .daybar{margin-top:6px}
 .rich ol{padding-left:30px}
+
+/* ---- 說明頁 ---- */
+.guide{display:flex;flex-direction:column;gap:34px}
+.stop{display:flex;flex-direction:column;gap:14px}
+.stop-h{display:flex;align-items:center;gap:10px}
+.stop-h b{width:28px;height:28px;border-radius:50%;background:var(--fg);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:0 0 auto}
+.stop-h h2{font-size:19px;font-weight:700}
+.sample{background:var(--soft);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.sample-label{font-size:11.5px;color:var(--muted);font-weight:700;letter-spacing:.04em}
+.sample .fakecard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.sample .fakecard b{font-size:15px}
+.sample .cattabs{margin:0;padding:0;pointer-events:none}
+.explain{display:flex;flex-direction:column;gap:10px;font-size:15.5px;line-height:1.7}
+.explain h3{font-size:15px;margin-top:4px}
+.explain dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 12px;align-items:start}
+.explain dt .pill{white-space:nowrap}
+.explain dd{margin:0;color:var(--fg2);font-size:15px;line-height:1.6}
+.explain ul,.explain ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;color:var(--fg2)}
+.explain .small{font-size:13.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -376,7 +395,7 @@ const I = {
   today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg>',
   claims:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/><path d="M8.5 11l1.8 1.8 3.4-3.6"/></svg>',
   archive:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>',
-  rules:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 4h12v16H6z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>'
+  rules:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>'
 };
 
 /* Notion 內文 → HTML */
@@ -629,7 +648,7 @@ function sourcesHTML(e){
     <div class="srcs">${e.sources.map(s => { const l = LEAN[s.lean];
       return `<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener"><span style="min-width:0"><b>${esc(s.name)}</b><span class="t">${esc(s.title || hostOf(s.url))}</span></span>
         <span class="pills">${l ? `<span class="pill ${l[1]}">${l[0]}</span>` : ''}${I.ext}</span></a>`; }).join('')}</div>
-    <p class="legend">偏綠、偏藍、中立依一般認知標示，詳見「原則」頁。</p></div></details>`;
+    <p class="legend">偏綠、偏藍、中立依一般認知標示，詳見「說明」頁。</p></div></details>`;
 }
 
 /* 一行：幾家媒體報導、各立場幾家 */
@@ -708,7 +727,7 @@ function sourcesGroupedHTML(e){
   return `<details class="fold"><summary><span>來源與各家標題<small>${e.sources.length} 篇</small></span></summary><div class="inner">${indep}
     ${order.filter(([k]) => by[k]).map(([k, l]) => `<div class="srcgroup"><h4>${LEAN[k] ? `<span class="pill ${LEAN[k][1]}">${l}</span>` : `<span class="pill line">${l}</span>`}${esc((cv[k] || []).join('、'))}</h4>
       ${by[k].map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener"><span style="min-width:0"><b>${esc(shortName(s.name))}</b>${esc(s.title || hostOf(s.url))}</span>${I.ext}</a>`).join('')}</div>`).join('')}
-    <p class="srcnote">偏綠、偏藍、中立依一般認知標示，說明見「原則」頁。</p></div></details>`;
+    <p class="srcnote">偏綠、偏藍、中立依一般認知標示，說明見「說明」頁。</p></div></details>`;
 }
 
 async function viewEvent(date, id){
@@ -778,7 +797,7 @@ async function viewClaims(){
     <section style="display:flex;flex-direction:column;gap:6px">
       <h1 class="h1">查證追蹤</h1>
       <p class="date">每一條需要查證的說法和目前狀態。只呈現說法與證據，不做排行。</p>
-      <a class="morelink" href="#principles">標記是什麼意思？看「原則」頁 →</a>
+      <a class="morelink" href="#principles">標記是什麼意思？看「說明」頁 →</a>
     </section>
     <section class="filters">
       <div class="chips" aria-label="依狀態篩選">${statuses.map(s => {
@@ -817,41 +836,53 @@ async function viewArchive(){
       || '<p class="empty">還沒有歸檔。</p>'}</section>`;
 }
 
-/* 原則頁：網頁精簡版（Notion 主頁保留完整編輯規範） */
+/* 說明頁：依讀者動線（首頁 → 文章 → 深入 → 查證追蹤）由淺到深；Notion 主頁保留完整編輯規範 */
 async function viewPrinciples(){
-  const dl = rows => `<dl>${rows.join('')}</dl>`;
-  const markRows = ['✅','❌','⚖','⏳','🔍','💬','⚠','✂','🕐'].map(k => { const [e, l, c, d] = LABELS[k]; return `<dt><span class="pill ${c}">${e} ${l}</span></dt><dd>${esc(d)}</dd>`; });
-  const natureRows = NATURE_TYPES.map(([, e, l, d]) => `<dt><span class="pill line">${e} ${l}</span></dt><dd>${esc(d)}</dd>`);
-  const sec = (t, inner) => `<section class="sec"><h2>${t}</h2>${inner}</section>`;
-  return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">原則</h1>
+  const row = (pill, text) => `<dt>${pill}</dt><dd>${esc(text)}</dd>`;
+  const mark = k => { const [e, l, c] = LABELS[k]; return `<span class="pill ${c}">${e} ${l}</span>`; };
+  const stop = (n, title, sample, body) => `<section class="stop"><div class="stop-h"><b>${n}</b><h2>${title}</h2></div>
+    ${sample ? `<div class="sample" aria-hidden="true"><span class="sample-label">你會看到</span>${sample}</div>` : ''}<div class="explain">${body}</div></section>`;
+  const covDemo = `<span class="covmini"><span><i class="g"></i>綠 3</span><span><i class="n"></i>中 1</span><span><i class="b"></i>藍 3</span></span>`;
+  return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">怎麼看這個網站</h1>
       <p class="date">每天整理台灣的重要新聞，比對不同立場的媒體、對照一手資料，說明實際發生了什麼。</p></section>
-    ${sec('我們怎麼做', `<div class="rich"><ul>
-      <li>每則政治新聞至少比對偏綠、偏藍、中立各一家媒體；找不到某一方時，會在文章裡註明。</li>
-      <li>事實和說法分開寫：有一手資料或多家各自採訪證實的才算事實，其餘都寫成「某某表示」。</li>
+  <div class="guide">
+  ${stop(1, '首頁', `
+      <nav class="cattabs"><span class="cattab" aria-pressed="true">政治<small>5</small></span><span class="cattab">社會<small>2</small></span><span class="cattab">國際<small>1</small></span></nav>
+      <div class="fakecard"><div class="pills"><span class="pill line">🗣️ 爭議＋⚔️ 選戰</span></div><b>（新聞標題）</b><div class="tags"><span>比對 7 家媒體</span>${covDemo}</div></div>`, `
+      <p>上方切換新聞類別。每張卡片左上角是這則新聞的<b>性質</b>：</p>
+      <dl>${NATURE_TYPES.map(([, e, l, d]) => row(`<span class="pill line">${e} ${l}</span>`, d)).join('')}</dl>
+      <p class="small">有些新聞會有兩個性質，例如「🗣️ 爭議＋⚔️ 選戰」，前面那個是主要的。</p>
+      <h3>綠 3・中 1・藍 3 是什麼？</h3>
+      <p>這則新聞有幾家偏綠、中立、偏藍的媒體報導。顏色淡掉代表那一方沒找到報導。</p>
+      <dl>${row('<span class="pill l-green">偏綠</span>', '一般認為立場較接近民進黨')}${row('<span class="pill l-neutral">中立</span>', '通訊社、公共媒體等，作為比對基準')}${row('<span class="pill l-blue">偏藍</span>', '一般認為立場較接近國民黨')}</dl>
+      <h3>為什麼是這個順序？</h3>
+      <ol><li>先排性質：📌 政策 → 📊 數字 → 🗣️ 爭議 → ⚔️ 選戰</li><li>再排查證：越確定的越前面</li><li>都一樣時，依編輯排定的順序</li></ol>
+      <p class="small">不依報導家數排，因為媒體報得多，不代表對你比較重要。我們也不另外挑「重點」。</p>`)}
+  ${stop(2, '點進文章', `
+      <div class="pills"><span class="pill s-ok">✅ 經過已證實</span><span class="pill s-mid">🔍 1 項待證據</span></div>
+      <div class="fakecard"><div class="say">${mark('💬')} 某某：說了什麼……</div><div class="say">${mark('🔍')} 某某：指控了什麼……</div></div>`, `
+      <p>最上面的標籤是<b>整則事件</b>的狀態。「經過已證實」表示誰、何時、做了什麼已經確認；「1 項待證據」表示裡面還有一個說法沒有證據。</p>
+      <p>「各方怎麼說」裡，<b>每一句話</b>前面也有標記：</p>
+      <dl>${['✅','🔍','💬','⚖','⏳','⚠','✂','❌'].map(k => row(mark(k), LABELS[k][3])).join('')}</dl>
+      <p class="small">文章一開始的「一句話看懂」和「你可以這樣想」，是 30 秒就能讀完的總結；往下才是事實、各方說法和媒體寫法。</p>`)}
+  ${stop(3, '想深入時', `
+      <div class="fakecard"><b style="font-size:14px">怎麼查證的　＋</b></div><div class="fakecard"><b style="font-size:14px">來源與各家標題　＋</b></div>`, `
+      <p>文章最下面可以展開看查證過程和每一篇原始報導。我們是這樣比對的：</p>
+      <ul><li>政治新聞至少比對偏綠、偏藍、中立各一家；找不到某一方時會註明。</li>
+      <li>有一手資料或多家各自採訪證實的才算事實，其餘都寫成「某某表示」。</li>
       <li>多家轉載同一篇稿子，只算一個來源。</li>
-      <li>查不到的不下結論，不讀付費牆內容。</li>
-      <li>每則都附原文連結，可以自己點回去看。</li></ul></div>`)}
-    ${sec('標記說明', `<div class="legend2"><div>${dl(markRows)}
-      <p class="date" style="margin-top:8px">文章最上面的標記是整則事件的總結，例如「✅ 經過已證實」表示事件經過已證實；文章裡每一句說法另外各有標記。</p></div></div>`)}
-    ${sec('內容性質', `<div class="legend2"><div>${dl(natureRows)}
-      <p class="date" style="margin-top:8px">每則選一個主要性質，需要時再加一個次要性質，例如「🗣️ 爭議＋⚔️ 選戰」。</p></div></div>`)}
-    ${sec('排列順序', `<div class="rich"><p>每個分類裡的新聞依固定規則排列，不由人工挑選重點：</p><ol>
-      <li>主要性質：📌 政策 → 📊 數字 → 🗣️ 爭議 → ⚔️ 選戰</li>
-      <li>查證狀態：✅ 已證實 → ❌ 有誤 → ⚖️ 各說各話 → ⏳ 待確認</li>
-      <li>以上都相同時，依編輯排定的順序</li></ol>
-      <p>不依報導家數排列：報導多寡反映的是媒體關注度，不等於對讀者的重要性。</p></div>`)}
-    ${sec('媒體立場', `<div class="legend2"><div><dl>
-      <dt><span class="pill l-green">偏綠</span></dt><dd>一般認為立場較接近民進黨</dd>
-      <dt><span class="pill l-blue">偏藍</span></dt><dd>一般認為立場較接近國民黨</dd>
-      <dt><span class="pill l-neutral">中立</span></dt><dd>通訊社、公共媒體等，作為比對基準</dd></dl></div></div>`)}
-    ${sec('爆料怎麼處理', `<div class="rich"><ul>
-      <li>爆料一律先標 🔍 待證據，有查核報告、原始文件、官方數據、判決或完整影音才改標記。</li>
+      <li>查不到的不下結論，不讀付費牆內容。</li></ul>`)}
+  ${stop(4, '查證追蹤', `<div class="pills">${mark('🔍')}${mark('🕐')}${mark('✅')}${mark('❌')}</div>`, `
+      <p>底部「查證」頁列出所有需要證據的說法，持續追到有結果為止。</p>
+      <dl>${row(mark('🕐'), LABELS['🕐'][3])}</dl>
+      <ul><li>爆料一律先標「待證據」，有查核報告、原始文件、官方數據、判決或完整影音才改標記。</li>
       <li>藍、綠、白、政府、媒體都用同一套標準，不幫任何人貼「常造謠」之類的標籤。</li>
-      <li>沒什麼人在傳的不實說法不收，避免反而幫忙擴散。</li></ul></div>`)}`;
+      <li>沒什麼人在傳的不實說法不收，避免反而幫忙擴散。</li></ul>`)}
+  </div>`;
 }
 
 /* ---------- 網址：#today、#d-日期、#e-日期-ID、#claims、#archive、#principles ---------- */
-const NAV = [['today','今日',I.today],['claims','查證',I.claims],['archive','歸檔',I.archive],['principles','原則',I.rules]];
+const NAV = [['today','今日',I.today],['claims','查證',I.claims],['archive','歸檔',I.archive],['principles','說明',I.rules]];
 let lastRoute = '';
 async function route(){
   const h = location.hash.slice(1) || 'today';
