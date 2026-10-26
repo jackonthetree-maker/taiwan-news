@@ -331,6 +331,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .crow{display:flex;flex-direction:column;gap:6px;padding-block:6px}
 .crow + .crow{border-top:1px dashed var(--line);padding-top:12px}
 .crow h3{font-size:15.5px;line-height:1.55}
+.speaker h3 .role{font-size:13px;font-weight:500;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -594,20 +595,37 @@ function sayHTML(rs){
   if (m && m[1].split(/[、，,]/).every(t => isOutlet(t, []))) { main = splitAt(main, m.index)[0]; by = m[1]; }
   return `<div class="say">${withMark(main)}${by ? `<span class="by">來源：${esc(by)}</span>` : ''}${tail.length ? `<div class="need">${needHTML(tail)}</div>` : ''}</div>`;
 }
+/* 發言者：「名字（目前職位）」分成名字與職位；括號裡如果是臉書、記者會這類管道，不算另一個人，改寫進那句話 */
+const CHANNEL_RE = /^(臉書|Facebook|FB|IG|Instagram|Threads|推特|X|記者會|受訪|直播|貼文|聲明|新聞稿)/i;
+function parseSpeaker(label){
+  const m = String(label || '').trim().match(/^(.+?)（(.+)）$/);
+  if (!m) return { name: String(label || '').trim(), role: '', via: '' };
+  return CHANNEL_RE.test(m[2]) ? { name: m[1].trim(), role: '', via: m[2] } : { name: m[1].trim(), role: m[2], via: '' };
+}
 function speakersHTML(nodes){
   const groups = [], byName = {};
-  const add = (name, html) => { if (!byName[name]) { byName[name] = []; groups.push(name); } byName[name].push(html); };
+  const add = (label, html) => {
+    const { name, role } = parseSpeaker(label);
+    if (!byName[name]) { byName[name] = { role, items: [] }; groups.push(name); }
+    if (!byName[name].role && role) byName[name].role = role;
+    byName[name].items.push(html);
+  };
   for (const n of nodes) {
-    if (n.c && n.c.length) { add(runsText(n.r).replace(MARK_RE, '').trim(), n.c.map(c => sayHTML(c.r)).join('')); continue; }
+    if (n.c && n.c.length) {
+      const label = runsText(n.r).replace(MARK_RE, '').trim(), { via } = parseSpeaker(label);
+      add(label, n.c.map(c => sayHTML(via ? [{ x: `（${via}）` }, ...c.r] : c.r)).join('')); continue;
+    }
     const rs = n.r || [], txt = runsText(rs), mk = txt.match(MARK_RE);
     const after = mk ? txt.slice(mk[0].length) : txt;
-    const sp = after.match(/^([^：。]{1,30})：/);
+    const sp = after.match(/^([^：。]{1,40})：/);
     if (sp) {
+      const { via } = parseSpeaker(sp[1]);
       const body = cutRuns(rs, (mk ? mk[0].length : 0) + sp[0].length);
-      add(sp[1].trim(), sayHTML(mk ? [{ x: mk[1] + ' ' }, ...body] : body));
+      const lead = [...(mk ? [{ x: mk[1] + ' ' }] : []), ...(via ? [{ x: `（${via}）` }] : [])];
+      add(sp[1], sayHTML([...lead, ...body]));
     } else add('', sayHTML(rs));
   }
-  return `<div class="speakers">${groups.map(g => `<div class="speaker">${g ? `<h3>${esc(g)}</h3>` : ''}${byName[g].join('')}</div>`).join('')}</div>`;
+  return `<div class="speakers">${groups.map(g => `<div class="speaker">${g ? `<h3>${esc(g)}${byName[g].role ? `<span class="role">${esc(byName[g].role)}</span>` : ''}</h3>` : ''}${byName[g].items.join('')}</div>`).join('')}</div>`;
 }
 
 /* 各家報導的差異：每一點一張卡；「偏綠的…／偏藍的…／中央社…」變成有顏色標籤的列 */
