@@ -361,7 +361,6 @@ def build(api, save_images=True):
             "primaryNature": prop(p, "主要性質"),
             "secondaryNature": prop(p, "次要性質"),
             "check": prop(p, "查證狀態"),
-            "highlight": bool(prop(p, "今日重點")),
             "mediaCount": prop(p, "比對媒體數"),
             "independentCount": prop(p, "獨立來源數"),
             "gap": prop(p, "立場缺口"),
