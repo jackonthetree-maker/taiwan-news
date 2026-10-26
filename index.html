@@ -106,7 +106,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .sec > h2{font-size:17px;font-weight:700}
 .lead{background:var(--soft);border-radius:16px;padding:16px 18px;font-size:16px;line-height:1.8}
 .lead h2{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:4px}
-.rich{font-size:15.5px;line-height:1.85;color:var(--fg2);display:flex;flex-direction:column;gap:8px;min-width:0}
+.rich{font-size:16px;line-height:1.75;color:var(--fg);display:flex;flex-direction:column;gap:8px;min-width:0}
 .rich ul,.rich ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
 .rich li > ul,.rich li > ol{margin-top:7px}
 .rich b{color:var(--fg)}
@@ -150,6 +150,136 @@ figcaption{font-size:12px;color:var(--muted)}
 .nav a svg{width:22px;height:22px}
 .nav a[aria-current="page"]{color:var(--fg);font-weight:700}
 @media (prefers-reduced-motion:no-preference){.view{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+
+/* ---- 事件頁新版 ---- */
+.ev{display:flex;flex-direction:column;gap:30px}
+.ev-head{display:flex;flex-direction:column;gap:12px}
+.ev .photo{aspect-ratio:16/9}
+.ev .sec{gap:12px}
+.ev .sec > h2{font-size:18px}
+.meta{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.leadbox{display:flex;flex-direction:column;gap:6px}
+.leadbox h2{font-size:14px;color:var(--muted);font-weight:700}
+.leadbox .rich{font-size:17.5px;line-height:1.75}
+.think{border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.think h2{font-size:14px !important;color:var(--muted)}
+.think .rich{font-size:16px}
+
+.cov{display:flex;flex-direction:column;gap:10px;background:var(--soft);border-radius:16px;padding:14px 16px}
+.cov h2{font-size:13px;color:var(--muted);font-weight:700}
+.cov-bar{display:flex;gap:3px;height:10px}
+.cov-bar span{border-radius:999px;min-width:10px}
+.cov-bar .g{background:var(--green)} .cov-bar .n{background:var(--wait)} .cov-bar .b{background:var(--blue)}
+.cov-bar .z{background:repeating-linear-gradient(135deg,var(--line) 0 4px,transparent 4px 8px);border:1px dashed var(--line)}
+.cov-rows{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:6px 10px;align-items:baseline;font-size:14px}
+.cov-rows b{font-variant-numeric:tabular-nums}
+.cov-rows .names{color:var(--fg2)}
+.cov-rows .none{color:var(--muted)}
+.cov-note{font-size:13.5px;color:var(--fg2);line-height:1.6}
+.cov-note b{color:var(--mid)}
+.covmini{display:inline-flex;gap:8px;align-items:center}
+.covmini i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:0}
+.covmini .g{background:var(--green)} .covmini .n{background:var(--wait)} .covmini .b{background:var(--blue)}
+.covmini .zero{opacity:.45}
+
+.facts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.facts > li{display:grid;grid-template-columns:8px minmax(0,1fr);gap:10px;font-size:16px;line-height:1.7}
+.facts > li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--ok);margin-top:.7em}
+.facts .by{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.facts ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px;font-size:15px;color:var(--fg2)}
+
+.speakers{display:flex;flex-direction:column;gap:10px}
+.speaker{border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.speaker h3{font-size:15px}
+.say{display:flex;flex-direction:column;gap:6px;font-size:15.5px;line-height:1.7}
+.say .pill{align-self:flex-start}
+.need{font-size:13.5px;line-height:1.6;color:var(--fg2);background:var(--mid-bg);border-radius:10px;padding:8px 10px}
+.need b{color:var(--mid)}
+
+.diffs{display:flex;flex-direction:column;gap:10px}
+.diff{border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.diff h3{font-size:15.5px;line-height:1.5}
+.diff > p{font-size:15px;line-height:1.7;color:var(--fg)}
+.rows{display:flex;flex-direction:column;gap:8px}
+.row{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:start;font-size:14.5px;line-height:1.65}
+.row .pill{justify-content:center;margin-top:1px}
+.row.plain{grid-template-columns:44px minmax(0,1fr)}
+.row.plain::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--muted);justify-self:center;margin-top:.65em}
+.concl{font-size:14.5px;line-height:1.65;background:var(--soft);border-radius:10px;padding:8px 12px}
+
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.checks li{display:flex;flex-direction:column;gap:4px;font-size:15px;line-height:1.65}
+.checks .pill{align-self:flex-start}
+.morelink{font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:4px;min-height:44px}
+
+.fold{border:1px solid var(--line);border-radius:16px;padding:0 16px}
+.fold > summary{cursor:pointer;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:15px;font-weight:700;list-style:none}
+.fold > summary::-webkit-details-marker{display:none}
+.fold > summary::after{content:"＋";font-weight:400;color:var(--muted)}
+.fold[open] > summary::after{content:"－"}
+.fold > summary small{font-weight:400;color:var(--muted);font-size:13px;margin-left:6px}
+.fold .inner{padding-bottom:12px;display:flex;flex-direction:column;gap:10px}
+.heads{display:flex;flex-direction:column;gap:14px}
+.heads h4{margin:0 0 6px;font-size:13px}
+.heads ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.heads li{font-size:14px;line-height:1.55}
+.heads li b{margin-right:6px}
+
+.legend2{display:flex;flex-direction:column;gap:16px}
+.legend2 h3{font-size:14px;color:var(--muted)}
+.legend2 dl{margin:6px 0 0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 12px;align-items:start}
+.legend2 dt .pill{white-space:nowrap}
+.legend2 dd{margin:0;font-size:15px;line-height:1.6;color:var(--fg2)}
+
+/* ---- 三層版 ---- */
+.covline{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.covline .covmini{gap:10px}
+.gapline{font-size:13px;color:var(--mid);line-height:1.6}
+.summary{background:var(--soft);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.summary h2{font-size:13px;color:var(--muted);font-weight:700;margin-bottom:4px}
+.summary .rich{font-size:17px;line-height:1.75}
+.summary .think .rich{font-size:15.5px;color:var(--fg2)}
+.summary .think{border-top:1px solid var(--line);padding-top:12px;border-radius:0;border-left:0;border-right:0;border-bottom:0}
+.bg .rich{font-size:15px;color:var(--fg2)}
+.bg .issue{font-size:13px}
+
+.tabs{display:flex;flex-direction:column;gap:12px}
+.tabs > input{position:absolute;opacity:0;pointer-events:none}
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:var(--soft);border-radius:12px;padding:4px;gap:4px}
+.seg label{min-height:40px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:9px;font-size:14.5px;font-weight:500;color:var(--muted);cursor:pointer}
+.seg label small{font-size:12px;opacity:.8}
+.panel{display:none}
+.tabs > input:nth-of-type(1):checked ~ .seg label:nth-of-type(1),
+.tabs > input:nth-of-type(2):checked ~ .seg label:nth-of-type(2){background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.tabs > input:nth-of-type(1):checked ~ .p1,
+.tabs > input:nth-of-type(2):checked ~ .p2{display:block}
+.tabs > input:focus-visible ~ .seg{outline:2px solid var(--fg);outline-offset:2px}
+.speaker h3{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.speaker h3 .names{font-weight:700}
+.tip{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.tip > h3{font-size:14px;color:var(--muted)}
+.tipcard{background:var(--mid-bg);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:1.65}
+.tipcard b{color:var(--fg)}
+.tipcard .rows{gap:6px}
+.deeper{display:flex;flex-direction:column;gap:10px}
+.deeper > p{font-size:13px;color:var(--muted);font-weight:700}
+.srcgroup{display:flex;flex-direction:column;gap:6px}
+.srcgroup h4{margin:6px 0 0;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);font-weight:500}
+.srcgroup a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-height:44px;padding-block:6px;border-bottom:1px solid var(--line);text-decoration:none;font-size:14px;line-height:1.5}
+.srcgroup a b{display:block;font-size:13px;color:var(--muted);font-weight:500}
+.srcnote{font-size:13px;color:var(--muted);line-height:1.6}
+.say .by{font-size:12.5px;color:var(--muted);margin-top:-2px}
+.summary .think{display:block;border:0;border-top:1px solid var(--line);border-radius:0;padding:14px 0 0}
+.summary .rich,.summary .think .rich{font-size:16.5px;line-height:1.75;color:var(--fg)}
+.summary h2,.summary .think h2{font-size:13px !important;color:var(--muted);font-weight:700;margin:0 0 4px}
+.series{align-self:flex-start;font-size:12.5px;color:var(--fg2);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.need{background:var(--soft) !important;color:var(--muted) !important;font-size:13px !important}
+.need b{color:var(--fg2) !important;font-weight:600}
+.say > .pill,.checks .pill{font-size:12.5px;font-weight:700;padding:4px 10px}
+.say{display:block}
+.say > .pill{display:inline-flex;margin-right:6px;vertical-align:2px}
+.say .by{display:block;margin-top:2px}
+.say .need{margin-top:6px}
 </style>
 </head>
 <body>
@@ -184,25 +314,41 @@ const fmtShort = d => { const x = dt(d); return `${x.getMonth()+1}/${x.getDate()
 const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./,''); } catch(e){ return u; } };
 const pick = (map, s) => map[Object.keys(map).find(k => (s || '').startsWith(k))];
 
-const CHECK = { '✅':'s-ok', '⚖️':'s-mid', '❌':'s-bad', '⏳':'s-wait' };
-const CLAIM = { '🔍':'s-mid', '🕐':'s-wait', '✅':'s-ok', '❌':'s-bad', '✂️':'s-cut', '⚠️':'s-cut' };
-const checkCls = s => pick(CHECK, s) || 's-wait';
-const claimCls = s => pick(CLAIM, s) || 's-wait';
-/* 內文裡的說法標記：✅ 事實、🔍 待證據、💬 觀點 用不同顏色 */
-const MARKS = [['✅','事實','s-ok'],['🔍','待證據','s-mid'],['💬','觀點','s-view'],['⚠️','誤導','s-cut'],['❌','不實','s-bad'],['✂️','斷章取義','s-cut']];
-/* 圖示說明（與 Notion 主頁「說法分類」「查證結果圖示」一致） */
-const LEGEND = [
-  ['✅','事實／屬實','有證據證明是對的','s-ok'],
-  ['🔍','待證據','還沒有證據證明真假','s-mid'],
-  ['💬','觀點','解讀或評價，本來就沒有真假','s-view'],
-  ['⚠️','誤導','沒造假，但標題或數字的寫法讓人誤會','s-cut'],
-  ['✂️','斷章取義','原話是真的，但剪掉前後文，意思被扭曲','s-cut'],
-  ['❌','不實','有證據證明是錯的','s-bad'],
-  ['🕐','久未舉證','超過 30 天沒人拿出證據（不等於假的）','s-wait']
-];
-const legendTip = s => { const l = LEGEND.find(([e]) => (s || '').startsWith(e)); return l ? l[2] : ''; };
-const legendHTML = () => `<details class="legend-box"><summary>標記是什麼意思？</summary><dl>${LEGEND.map(([e, n, d, c]) => `<dt><span class="pill ${c}">${e} ${n}</span></dt><dd>${d}</dd>`).join('')}</dl></details>`;
+/* 標記：同一個圖示在整個網站只用一個名稱（事件查證狀態、說法標記、查證追蹤都一樣） */
+const LABELS = {
+  '✅':['✅','已證實','s-ok','有一手資料（官方文件、數據、完整影音），或多家各自採訪的報導一致'],
+  '⚖':['⚖️','各說各話','s-mid','各方說法不同，目前沒有證據能判斷誰對'],
+  '⏳':['⏳','待確認','s-wait','剛發生，可靠資料還不夠，之後會補'],
+  '❌':['❌','有誤','s-bad','有證據證明說法或報導是錯的'],
+  '🔍':['🔍','待證據','s-mid','可以查證，但還沒有人拿出證據'],
+  '💬':['💬','觀點','s-view','解讀、評價或預測，本來就沒有真假'],
+  '⚠':['⚠️','誤導','s-cut','沒有造假，但標題或數字的寫法容易讓人誤會'],
+  '✂':['✂️','斷章取義','s-cut','原話是真的，但剪掉前後文，意思被改變'],
+  '🕐':['🕐','久未舉證','s-wait','超過 30 天沒人拿出證據（不代表是假的）']
+};
+const EVENT_MARKS = ['✅','⚖','⏳','❌'];
+const CLAIM_MARKS = ['✅','🔍','💬','⚠','✂','❌','🕐'];
+const MARK_RE = /^\s*(✅|🔍|💬|⚖️?|⏳|⚠️?|✂️?|❌|🕐)\s*/;
+const markKey = s => { const m = (s || '').match(MARK_RE); return m ? m[1].replace(/️/g, '') : null; };
+const EVENT_LABEL = { '✅':['✅','經過已證實','s-ok','事件本身（誰、何時、做了什麼）已有一手資料或多家各自採訪的報導證實；事件裡個別的說法另外標示'] };
+const pendingCount = e => {
+  const s = (e.sections || []).find(x => x.title.startsWith('各方說法')); let n = 0;
+  const walk = ns => (ns || []).forEach(x => { if (/^\s*🔍/.test(runsText(x.r))) n++; walk(x.c); });
+  if (s) walk(s.body); return n;
+};
+const statusPill = (s, ev) => {
+  const k = markKey(s);
+  if (!k) return s ? `<span class="pill s-wait">${esc(s)}</span>` : '';
+  const [e, l, c, d] = (ev && EVENT_LABEL[k]) || LABELS[k];
+  return `<span class="pill ${c}" title="${esc(d)}">${e} ${l}</span>`;
+};
+const labelOf = s => { const k = markKey(s); return k ? `${LABELS[k][0]} ${LABELS[k][1]}` : (s || ''); };
+/* Notion 文字裡舊名稱的寫法，顯示時統一 */
+const normText = t => String(t ?? '')
+  .replace(/✅\s*(事實|屬實)/g, '✅ 已證實').replace(/❌\s*(報導有誤|不實)/g, '❌ 有誤').replace(/⚠️?\s*部分正確/g, '⚠️ 誤導');
 const LEAN = { green:['偏綠','l-green'], blue:['偏藍','l-blue'], neutral:['中立','l-neutral'] };
+const shortName = n => String(n || '').replace(/\s*(新聞網|新聞雲|新聞|Newtalk)$/i, '').trim();
+const OUTLETS = ['中央社','公視','聯合','中時','中國時報','TVBS','自由','三立','民視','新頭殼','ETtoday','鏡週刊','鏡','報導者','風傳媒','太報','更生日報','壹蘋','關鍵評論網','東森','華視','Yahoo'];
 
 const I = {
   back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
@@ -216,7 +362,7 @@ const I = {
 /* Notion 內文 → HTML */
 function runsHTML(rs){
   return (rs || []).map(r => {
-    let h = esc(r.x);
+    let h = esc(normText(r.x));
     if (r.b) h = `<b>${h}</b>`;
     if (r.i) h = `<i>${h}</i>`;
     if (r.a) h = `<a href="${esc(r.a)}" target="_blank" rel="noopener">${h}</a>`;
@@ -225,10 +371,10 @@ function runsHTML(rs){
 }
 function withMark(rs){
   const first = rs && rs[0] ? rs[0].x : '';
-  const m = MARKS.find(([e]) => first.startsWith(e));
+  const m = first.match(MARK_RE);
   if (!m) return runsHTML(rs);
-  const rest = [{ ...rs[0], x: first.slice(m[0].length).trimStart() }, ...rs.slice(1)];
-  return `<span class="pill mark ${m[2]}" title="${esc(legendTip(m[0]))}">${m[1]}</span>` + runsHTML(rest);
+  const rest = [{ ...rs[0], x: first.slice(m[0].length) }, ...rs.slice(1)];
+  return `${statusPill(m[1])} ` + runsHTML(rest);
 }
 function nodesHTML(nodes){
   let html = '', i = 0;
@@ -253,10 +399,15 @@ function nodesHTML(nodes){
 
 const img = (url, label, alt) => url
   ? `<img src="${esc(url)}" alt="${esc(alt || '')}" loading="lazy" data-fallback="${esc(label)}">` : esc(label);
-const statusPills = e => `
-  ${e.category ? `<span class="pill">${esc(e.category)}</span>` : ''}
-  ${e.check ? `<span class="pill ${checkCls(e.check)}">${esc(e.check)}</span>` : ''}
-  ${e.nature ? `<span class="pill line">${esc(e.nature)}</span>` : ''}`;
+const NATURE = { '🔀 混合':'🔀 政策＋選戰' };
+const statusPills = (e, hideCat) => {
+  const pend = markKey(e.check) === '✅' ? pendingCount(e) : 0;
+  return `
+  ${e.category && !hideCat ? `<span class="pill">${esc(e.category)}</span>` : ''}
+  ${e.check ? statusPill(e.check, true) : ''}
+  ${pend ? `<span class="pill s-mid" title="這則裡還沒有證據的說法">🔍 ${pend} 項待證據</span>` : ''}
+  ${e.nature ? `<span class="pill line">${esc(NATURE[e.nature] || e.nature)}</span>` : ''}`;
+};
 
 /* ---------- 畫面 ---------- */
 const state = { cat:'全部', cf:{ status:'全部', speaker:'', party:'' } };
@@ -264,11 +415,12 @@ const $view = document.getElementById('view');
 
 function eventCard(e){
   const tags = [];
-  if (e.mediaCount != null) tags.push(`<span>比對 ${e.mediaCount} 家</span>`);
-  if (e.independentCount != null) tags.push(`<span>獨立來源 ${e.independentCount}</span>`);
-  if (e.gap) tags.push(`<span class="gap">立場缺口：${esc(e.gap)}</span>`);
+  if (e.mediaCount != null) tags.push(`<span>比對 ${e.mediaCount} 家媒體</span>`);
+  const cv = coverage(e);
+  tags.push(`<span class="covmini" aria-label="偏綠 ${cv.green.length} 家、中立 ${cv.neutral.length} 家、偏藍 ${cv.blue.length} 家">${
+    [['green','g','綠'],['neutral','n','中'],['blue','b','藍']].map(([k, c, l]) => `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('')}</span>`);
   return `<a class="card" href="#e-${e.date}-${e.id}">
-    <div class="pills">${statusPills(e)}</div>
+    <div class="pills">${statusPills(e, true)}</div>
     <div class="main">
       <div style="min-width:0"><h3>${esc(e.title)}</h3>${e.summary ? `<p>${esc(e.summary)}</p>` : ''}</div>
       <div class="thumb">${img(e.photo && e.photo.url, '照片', e.title)}</div>
@@ -282,9 +434,11 @@ async function viewDay(date, isToday){
   if (!date) date = idx.latest;
   if (!date) return '<p class="empty">還沒有新聞資料。</p>';
   const d = await getDay(date);
-  const cats = ['全部', ...new Set(d.events.map(e => e.category).filter(Boolean))];
-  if (!cats.includes(state.cat)) state.cat = '全部';
-  const shown = state.cat === '全部' ? d.events : d.events.filter(e => e.category === state.cat);
+  const CAT_ORDER = ['政治','社會','經濟','科技產業','國際'];
+  const present = [...new Set(d.events.map(e => e.category).filter(Boolean))];
+  const cats = [...CAT_ORDER.filter(c => present.includes(c)), ...present.filter(c => !CAT_ORDER.includes(c))];
+  if (!cats.includes(state.cat)) state.cat = cats[0];
+  const shown = d.events.filter(e => e.category === state.cat);
   return `
     ${idx.preview ? '<p class="note">預覽資料：每日自動同步還沒開始。</p>' : ''}
     ${isToday ? '' : `<a class="iconbtn" href="#archive" aria-label="回到歸檔">${I.back}</a>`}
@@ -296,18 +450,226 @@ async function viewDay(date, isToday){
     ${d.top3 && d.top3.length ? `<section class="top3"><h2 class="h2">${isToday ? '今日三件重點' : '當日三件重點'}</h2><ol>${d.top3.map(t => `<li><span>${esc(t)}</span></li>`).join('')}</ol></section>` : ''}
     ${d.followUps && d.followUps.length ? `<section class="follow"><h2 class="h2">📌 追蹤更新</h2><ul>${d.followUps.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>` : ''}
     <section class="chips" aria-label="依類別篩選">${cats.map(c => {
-      const n = c === '全部' ? d.events.length : d.events.filter(e => e.category === c).length;
+      const n = d.events.filter(e => e.category === c).length;
       return `<button class="chip" data-cat="${esc(c)}" aria-pressed="${state.cat === c}">${esc(c)}<small>${n}</small></button>`;
     }).join('')}</section>
     <section class="list" aria-label="事件列表">${shown.map(eventCard).join('') || '<p class="empty">這個類別沒有事件。</p>'}</section>`;
 }
 
-function claimsMini(list){
-  return `<section class="sec"><h2>這則事件的查證追蹤</h2>${list.map(c => `
-    <div class="claim"><div class="pills"><span class="pill ${claimCls(c.status)}" title="${esc(legendTip(c.status))}">${esc(c.status)}</span></div>
-      <h3>${esc(c.claim)}</h3><p class="who">${esc(c.speaker || '')}${c.party ? ` · ${esc(c.party)}` : ''}</p>
-      ${c.needs && (c.status || '').startsWith('🔍') ? `<p class="who">需要的證據：${esc(c.needs)}${c.burden ? `（舉證：${esc(c.burden)}）` : ''}</p>` : ''}
-    </div>`).join('')}<a class="chip" style="align-self:flex-start" href="#claims">看全部查證追蹤</a></section>`;
+/* 各立場有哪些媒體報導（同一家多篇只算一次） */
+function coverage(e){
+  const out = { green:[], neutral:[], blue:[], other:[] };
+  for (const s of e.sources || []) {
+    const k = out[s.lean] ? s.lean : 'other', n = shortName(s.name);
+    if (!out[k].includes(n)) out[k].push(n);
+  }
+  return out;
+}
+function coverageHTML(e){
+  const cv = coverage(e);
+  const keys = [['green','g','偏綠'],['neutral','n','中立'],['blue','b','偏藍']];
+  const bar = keys.map(([k, c]) => `<span class="${cv[k].length ? c : 'z'}" style="flex:${Math.max(cv[k].length, 1)}"></span>`).join('');
+  const rows = keys.map(([k, c, l]) => `<span class="pill ${LEAN[k][1]}">${l}</span><b>${cv[k].length} 家</b>${
+    cv[k].length ? `<span class="names">${cv[k].map(esc).join('、')}</span>` : '<span class="none">沒找到報導</span>'}`).join('');
+  const note = e.gap && !/^無/.test(e.gap.trim()) ? `<p class="cov-note"><b>要注意：</b>${esc(e.gap)}</p>` : '';
+  return `<section class="cov" aria-label="哪些媒體有報導"><h2>哪些媒體有報導</h2><div class="cov-bar" aria-hidden="true">${bar}</div><div class="cov-rows">${rows}</div>${note}</section>`;
+}
+
+/* 文字片段工具 */
+const runsText = rs => (rs || []).map(r => r.x).join('');
+function cutRuns(rs, n){                  // 去掉開頭 n 個字
+  const out = []; let left = n;
+  for (const r of rs || []) {
+    if (left >= r.x.length) { left -= r.x.length; continue; }
+    out.push({ ...r, x: r.x.slice(left) }); left = 0;
+  }
+  return out;
+}
+function splitAt(rs, idx){                // 在第 idx 個字切成兩段
+  const a = [], b = []; let pos = 0;
+  for (const r of rs || []) {
+    const end = pos + r.x.length;
+    if (end <= idx) a.push(r);
+    else if (pos >= idx) b.push(r);
+    else { a.push({ ...r, x: r.x.slice(0, idx - pos) }); b.push({ ...r, x: r.x.slice(idx - pos) }); }
+    pos = end;
+  }
+  return [a, b];
+}
+const isOutlet = (t, names) => [...OUTLETS, ...names].some(o => o && t.trim().startsWith(o));
+
+/* 已確認的事實：句尾（中央社、聯合）改成小字來源 */
+function factsHTML(nodes, e){
+  const names = (e.sources || []).map(s => shortName(s.name));
+  const items = nodes.map(n => {
+    if (n.t !== 'li' && n.t !== 'ol' && n.t !== 'p') return '';
+    let rs = n.r || [], by = '';
+    const txt = runsText(rs), m = txt.match(/（([^（）]{1,40})）\s*。?$/);
+    if (m && m[1].split(/[、，,]/).every(t => isOutlet(t, names))) { rs = splitAt(rs, m.index)[0]; by = m[1]; }
+    return `<li><div>${withMark(rs)}${by ? `<span class="by">來源：${esc(by)}</span>` : ''}${n.c ? nodesHTML(n.c) : ''}</div></li>`;
+  }).join('');
+  return `<ul class="facts">${items}</ul>`;
+}
+
+/* 各方說法：依發言者分組，「→ 需要什麼證據」另起一行 */
+function needHTML(rs){
+  return runsHTML(rs).replace(/^\s*→\s*/, '')
+    .replace(/(需要什麼證據|要證明)：/g, '<b>需要的證據</b>：')
+    .replace(/(誰該舉證|舉證責任)：/g, '<b>誰該拿出證據</b>：');
+}
+function sayHTML(rs){
+  const txt = runsText(rs), i = txt.indexOf('→');
+  let [main, tail] = i > 0 ? splitAt(rs, i) : [rs, []], by = '';
+  const mt = runsText(main), m = mt.match(/（([^（）]{1,40})）\s*。?\s*$/);
+  if (m && m[1].split(/[、，,]/).every(t => isOutlet(t, []))) { main = splitAt(main, m.index)[0]; by = m[1]; }
+  return `<div class="say">${withMark(main)}${by ? `<span class="by">來源：${esc(by)}</span>` : ''}${tail.length ? `<div class="need">${needHTML(tail)}</div>` : ''}</div>`;
+}
+function speakersHTML(nodes){
+  const groups = [], byName = {};
+  const add = (name, html) => { if (!byName[name]) { byName[name] = []; groups.push(name); } byName[name].push(html); };
+  for (const n of nodes) {
+    if (n.c && n.c.length) { add(runsText(n.r).replace(MARK_RE, '').trim(), n.c.map(c => sayHTML(c.r)).join('')); continue; }
+    const rs = n.r || [], txt = runsText(rs), mk = txt.match(MARK_RE);
+    const after = mk ? txt.slice(mk[0].length) : txt;
+    const sp = after.match(/^([^：。]{1,30})：/);
+    if (sp) {
+      const body = cutRuns(rs, (mk ? mk[0].length : 0) + sp[0].length);
+      add(sp[1].trim(), sayHTML(mk ? [{ x: mk[1] + ' ' }, ...body] : body));
+    } else add('', sayHTML(rs));
+  }
+  return `<div class="speakers">${groups.map(g => `<div class="speaker">${g ? `<h3>${esc(g)}</h3>` : ''}${byName[g].join('')}</div>`).join('')}</div>`;
+}
+
+/* 各家報導的差異：每一點一張卡；「偏綠的…／偏藍的…／中央社…」變成有顏色標籤的列 */
+function leanRow(rs, e){
+  const txt = runsText(rs);
+  if (/^\s*→/.test(txt)) return `<div class="concl">${runsHTML(cutRuns(rs, txt.indexOf('→') + 1))}</div>`;
+  let m = txt.match(/^\s*(偏綠|偏藍|中立)的?\s*/);
+  if (m) {
+    const k = { '偏綠':'green', '偏藍':'blue', '中立':'neutral' }[m[1]];
+    return `<div class="row"><span class="pill ${LEAN[k][1]}">${LEAN[k][0]}</span><div>${runsHTML(cutRuns(rs, m[0].length))}</div></div>`;
+  }
+  const src = (e.sources || []).find(s => LEAN[s.lean] && txt.startsWith(shortName(s.name)));
+  if (src) return `<div class="row"><span class="pill ${LEAN[src.lean][1]}">${LEAN[src.lean][0]}</span><div>${runsHTML(rs)}</div></div>`;
+  return null;
+}
+function diffsHTML(nodes, e){
+  const cards = []; let pending = [];
+  const flush = () => { if (pending.length) { cards.push(`<div class="diff"><h3>各家寫法</h3><div class="rows">${pending.join('')}</div></div>`); pending = []; } };
+  for (const n of nodes) {
+    const rs = n.r || [];
+    if (n.c && n.c.length) {
+      flush();
+      const rows = n.c.map(c => leanRow(c.r, e) || `<div class="row plain"><div>${runsHTML(c.r)}</div></div>`).join('');
+      cards.push(`<div class="diff"><h3>${runsHTML(rs)}</h3><div class="rows">${rows}</div></div>`);
+      continue;
+    }
+    const bold = rs[0] && rs[0].b;
+    const lr = bold ? null : leanRow(rs, e);
+    if (lr) { pending.push(lr); continue; }
+    flush();
+    if (bold) {
+      const rest = rs.slice(1); if (rest[0]) rest[0] = { ...rest[0], x: rest[0].x.replace(/^\s*[：:]\s*/, '') };
+      cards.push(`<div class="diff"><h3>${runsHTML([rs[0]])}</h3>${rest.length ? `<p>${runsHTML(rest)}</p>` : ''}</div>`);
+    } else cards.push(`<div class="diff"><p>${runsHTML(rs)}</p></div>`);
+  }
+  flush();
+  return `<div class="diffs">${cards.join('')}</div>`;
+}
+function headlinesHTML(e){
+  const order = [['green','偏綠'],['neutral','中立'],['blue','偏藍'],['other','其他']];
+  const by = {}; for (const s of e.sources || []) if (s.title) (by[LEAN[s.lean] ? s.lean : 'other'] ||= []).push(s);
+  const n = Object.values(by).reduce((a, l) => a + l.length, 0);
+  if (n < 2) return '';
+  return `<details class="fold"><summary><span>各家原標題對照<small>${n} 則</small></span></summary><div class="inner heads">${order.filter(([k]) => by[k]).map(([k, l]) => `
+    <div><h4><span class="pill ${(LEAN[k] || ['', 'line'])[1]}">${l}</span></h4><ul>${by[k].map(s => `<li><b>${esc(shortName(s.name))}</b><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul></div>`).join('')}</div></details>`;
+}
+function sourcesHTML(e){
+  if (!e.sources.length) return '';
+  return `<details class="fold"><summary><span>來源<small>${e.sources.length} 篇報導</small></span></summary><div class="inner">
+    <div class="srcs">${e.sources.map(s => { const l = LEAN[s.lean];
+      return `<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener"><span style="min-width:0"><b>${esc(s.name)}</b><span class="t">${esc(s.title || hostOf(s.url))}</span></span>
+        <span class="pills">${l ? `<span class="pill ${l[1]}">${l[0]}</span>` : ''}${I.ext}</span></a>`; }).join('')}</div>
+    <p class="legend">偏綠、偏藍、中立依一般認知標示，詳見「原則」頁。</p></div></details>`;
+}
+
+/* 一行：幾家媒體報導、各立場幾家 */
+function covLineHTML(e, date){
+  const cv = coverage(e), total = e.mediaCount != null ? e.mediaCount : cv.green.length + cv.neutral.length + cv.blue.length + cv.other.length;
+  const dots = [['green','g','偏綠'],['neutral','n','中立'],['blue','b','偏藍']].map(([k, c, l]) =>
+    `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('');
+  const gap = e.gap && !/^無/.test(e.gap.trim()) ? `<p class="gapline">要注意：${esc(e.gap)}</p>` : '';
+  return `<div class="covline"><span>${date ? date + ' · ' : ''}${total} 家媒體報導</span><span class="covmini">${dots}</span></div>${gap}`;
+}
+
+/* 媒體怎麼寫：依立場分組，跟「人物怎麼說」同一種卡片；跨媒體的提醒另外列在「要注意」 */
+function parseLean(rs, e){
+  const txt = runsText(rs);
+  let m = txt.match(/^\s*(偏綠|偏藍|中立)的?\s*/), lean = null, cut = 0;
+  if (m) { lean = { '偏綠':'green', '偏藍':'blue', '中立':'neutral' }[m[1]]; cut = m[0].length; }
+  else {
+    const src = (e.sources || []).find(s => LEAN[s.lean] && txt.startsWith(shortName(s.name)));
+    if (!src) return null;
+    lean = src.lean;
+  }
+  let body = cutRuns(rs, cut), rest = runsText(body), names = [];
+  const c = rest.match(/^([^：。，]{1,24})：/);
+  if (c) { names = c[1].split(/[、，,／\/]/).map(s => s.trim()).filter(Boolean); body = cutRuns(body, c[0].length); }
+  else {
+    const src = (e.sources || []).find(s => rest.startsWith(shortName(s.name)));
+    if (src) names = [shortName(src.name)];
+  }
+  return { lean, names, body };
+}
+function mediaHTML(nodes, e){
+  const groups = { green:{ names:[], items:[] }, neutral:{ names:[], items:[] }, blue:{ names:[], items:[] } };
+  const tips = [];
+  const put = p => { const g = groups[p.lean]; p.names.forEach(n => g.names.includes(n) || g.names.push(n)); g.items.push(p); };
+  for (const n of nodes) {
+    const rs = n.r || [];
+    if (n.c && n.c.length) {
+      const parsed = n.c.map(c => parseLean(c.r, e));
+      if (parsed.every(Boolean)) { parsed.forEach(put); continue; }
+      tips.push(`<div class="tipcard"><b>${runsHTML(rs)}</b><div class="rows">${n.c.map(c => leanRow(c.r, e) || `<div class="row plain"><div>${runsHTML(c.r)}</div></div>`).join('')}</div></div>`);
+      continue;
+    }
+    const bold = rs[0] && rs[0].b;
+    const p = bold ? null : parseLean(rs, e);
+    if (p) { put(p); continue; }
+    if (bold) {
+      const rest = rs.slice(1); if (rest[0]) rest[0] = { ...rest[0], x: rest[0].x.replace(/^\s*[：:]\s*/, '') };
+      tips.push(`<div class="tipcard"><b>${runsHTML([rs[0]])}</b>${rest.length ? `<div>${runsHTML(rest)}</div>` : ''}</div>`);
+    } else tips.push(`<div class="tipcard"><div>${runsHTML(rs)}</div></div>`);
+  }
+  const cards = ['green','neutral','blue'].filter(k => groups[k].items.length).map(k =>
+    `<div class="speaker"><h3><span class="pill ${LEAN[k][1]}">${LEAN[k][0]}</span><span class="names">${groups[k].names.map(esc).join('、')}</span></h3>${groups[k].items.map(it => `<div class="say"><div>${groups[k].items.length > 1 && it.names.length ? `<b>${it.names.map(esc).join('、')}</b>：` : ''}${runsHTML(it.body)}</div></div>`).join('')}</div>`);
+  return { count: cards.length, html: `<div class="speakers">${cards.join('')}</div>${tips.length ? `<div class="tip"><h3>要注意</h3>${tips.join('')}</div>` : ''}` };
+}
+function whoSaysHTML(e, sides, diff){
+  const people = sides && sides.body.length ? speakersHTML(sides.body) : '';
+  const pCount = (people.match(/class="speaker"/g) || []).length;
+  const media = diff && diff.body.length ? mediaHTML(diff.body, e) : null;
+  if (!people && !media) return '';
+  if (!media) return `<section class="sec"><h2>各方怎麼說</h2>${people}</section>`;
+  if (!people) return `<section class="sec"><h2>各家媒體怎麼寫</h2>${media.html}</section>`;
+  const id = 'w' + e.id.slice(-6);
+  return `<section class="sec"><h2>各方怎麼說</h2><div class="tabs">
+    <input type="radio" name="${id}" id="${id}a" checked><input type="radio" name="${id}" id="${id}b">
+    <div class="seg" role="presentation"><label for="${id}a">人物<small>${pCount}</small></label><label for="${id}b">媒體<small>${media.count}</small></label></div>
+    <div class="panel p1">${people}</div><div class="panel p2">${media.html}</div>
+  </div></section>`;
+}
+function sourcesGroupedHTML(e){
+  if (!e.sources.length) return '';
+  const order = [['green','偏綠'],['neutral','中立'],['blue','偏藍'],['other','其他']];
+  const by = {}; for (const s of e.sources) (by[LEAN[s.lean] ? s.lean : 'other'] ||= []).push(s);
+  const cv = coverage(e);
+  const indep = e.independentCount != null && e.mediaCount != null
+    ? `<p class="srcnote">比對 ${e.mediaCount} 家媒體，其中 ${e.independentCount} 家自己採訪；轉載別家稿子的只算一次。</p>` : '';
+  return `<details class="fold"><summary><span>來源與各家標題<small>${e.sources.length} 篇</small></span></summary><div class="inner">${indep}
+    ${order.filter(([k]) => by[k]).map(([k, l]) => `<div class="srcgroup"><h4>${LEAN[k] ? `<span class="pill ${LEAN[k][1]}">${l}</span>` : `<span class="pill line">${l}</span>`}${esc((cv[k] || []).join('、'))}</h4>
+      ${by[k].map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener"><span style="min-width:0"><b>${esc(shortName(s.name))}</b>${esc(s.title || hostOf(s.url))}</span>${I.ext}</a>`).join('')}</div>`).join('')}
+    <p class="srcnote">偏綠、偏藍、中立依一般認知標示，說明見「原則」頁。</p></div></details>`;
 }
 
 async function viewEvent(date, id){
@@ -318,57 +680,57 @@ async function viewEvent(date, id){
   try { claims = (await getClaims()).claims.filter(c => e.claims.includes(c.id)); } catch(err){}
   const secs = e.sections || [];
   const get = t => secs.find(s => s.title.startsWith(t));
-  const ORDER = ['一句話看懂','已確認的事實','各方說法','各家報導的差異','查證說明','看完你可以怎麼想'];
-  const lead = get('一句話看懂');
-  let body = `<section class="lead"><h2>一句話看懂</h2>${lead ? `<div class="rich">${nodesHTML(lead.body)}</div>` : `<p>${esc(e.summary || '')}</p>`}</section>`;
-  for (const t of ORDER.slice(1)){
-    const s = get(t);
-    if (s && s.body.length) body += `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich${t === '各方說法' ? ' sides' : ''}">${nodesHTML(s.body)}</div></section>`;
-    if (t === '查證說明' && claims.length) body += claimsMini(claims);
-  }
-  for (const s of secs) if (![...ORDER, '前情', '來源'].some(o => s.title.startsWith(o)))
-    body += `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`;
+  const sec = (title, inner, cls = '') => `<section class="sec ${cls}"><h2>${esc(title)}</h2>${inner}</section>`;
+
+  /* 第一層：30 秒看懂 */
+  const lead = get('一句話看懂'), think = get('看完你可以怎麼想');
+  let body = `<section class="summary">
+    <div><h2>一句話看懂</h2>${lead ? `<div class="rich">${nodesHTML(lead.body)}</div>` : `<div class="rich"><p>${esc(e.summary || '')}</p></div>`}</div>
+    ${think && think.body.length ? `<div class="think"><h2>你可以這樣想</h2><div class="rich">${nodesHTML(think.body)}</div></div>` : ''}
+  </section>`;
+
+  /* 第二層：發生了什麼、誰怎麼說 */
+  const prior = get('前情');
+  if (prior || e.prior.length || e.issues.length) body += sec('前情', `
+    ${e.issues.map(i => `<span class="series">系列：${esc(i.name)}</span>`).join('')}
+    ${prior ? `<div class="rich">${nodesHTML(prior.body)}</div>` : ''}
+    ${e.prior.length ? `<div class="prior">${e.prior.map(p => `<a href="#d-${p.date}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}`, 'bg');
+  const facts = get('已確認的事實');
+  if (facts && facts.body.length) body += sec(facts.title, factsHTML(facts.body, e));
+  body += whoSaysHTML(e, get('各方說法'), get('各家報導的差異'));
+  const known = ['一句話看懂','看完你可以怎麼想','前情','已確認的事實','各方說法','各家報導的差異','查證說明','來源'];
+  for (const s of secs) if (!known.some(o => s.title.startsWith(o)) && s.body.length) body += sec(s.title, `<div class="rich">${nodesHTML(s.body)}</div>`);
   if (!secs.length) body += '<p class="note">完整內文整理中。</p>';
 
-  const prior = get('前情');
-  if (prior || e.prior.length || e.issues.length){
-    body += `<section class="sec"><h2>前情</h2>
-      ${e.issues.map(i => `<p class="issue">議題：${esc(i.name)}${i.background ? `｜${esc(i.background)}` : ''}</p>`).join('')}
-      ${prior ? `<div class="rich">${nodesHTML(prior.body)}</div>` : ''}
-      ${e.prior.length ? `<div class="prior">${e.prior.map(p => `<a href="#d-${p.date}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}
-    </section>`;
-  }
-  if (e.sources.length){
-    body += `<section class="sec"><h2>來源（${e.sources.length}）</h2>
-      <p class="legend">媒體立場依一般認知標示：<span class="pill l-green">偏綠</span><span class="pill l-blue">偏藍</span><span class="pill l-neutral">中立</span></p>
-      <div class="srcs">${e.sources.map(s => { const l = LEAN[s.lean];
-        return `<a class="src" href="${esc(s.url)}" target="_blank" rel="noopener"><span style="min-width:0"><b>${esc(s.name)}</b><span class="t">${esc(s.title || hostOf(s.url))}</span></span>
-          <span class="pills">${l ? `<span class="pill ${l[1]}">${l[0]}</span>` : ''}${I.ext}</span></a>`; }).join('')}</div></section>`;
-  }
-  const meta = [fmtShort(e.date)];
-  if (e.mediaCount != null) meta.push(`比對 ${e.mediaCount} 家`);
-  if (e.independentCount != null) meta.push(`獨立來源 ${e.independentCount}`);
+  /* 第三層：想深入再點開 */
+  const chk = get('查證說明');
+  const chkFold = (chk && chk.body.length) || claims.length ? `<details class="fold"><summary><span>怎麼查證的</span></summary><div class="inner">
+    ${chk ? `<ul class="checks">${chk.body.map(n => `<li>${withMark(n.r)}${n.c ? nodesHTML(n.c) : ''}</li>`).join('')}</ul>` : ''}
+    ${claims.length ? `<a class="morelink" href="#claims">這則有 ${claims.length} 條說法在「查證追蹤」持續追蹤 →</a>` : ''}</div></details>` : '';
+  const src = sourcesGroupedHTML(e);
+  if (chkFold || src) body += `<section class="deeper"><p>想深入再點開</p>${chkFold}${src}</section>`;
+
   const p = e.photo || {};
-  return `
-    <a class="iconbtn" href="#d-${e.date}" aria-label="回到 ${fmtShort(e.date)} 的事件列表">${I.back}</a>
-    <figure><div class="photo">${img(p.url, '新聞照片', e.title)}</div>
-      ${p.credit ? `<figcaption>照片：${esc(p.credit)}${p.source ? ` · <a href="${esc(p.source)}" target="_blank" rel="noopener">原文</a>` : ''}</figcaption>` : ''}</figure>
-    <section style="display:flex;flex-direction:column;gap:10px">
+  return `<div class="ev">
+    <div class="ev-head">
+      <a class="iconbtn" href="#d-${e.date}" aria-label="回到 ${fmtShort(e.date)} 的事件列表">${I.back}</a>
       <div class="pills">${statusPills(e)}</div>
       <h1 class="ttl">${esc(e.title)}</h1>
-      <p class="tags">${meta.map(m => `<span>${m}</span>`).join('')}</p>
-      ${e.gap ? `<p class="gapbox">立場缺口：${esc(e.gap)}</p>` : ''}
-      ${legendHTML()}
-    </section>
-    ${body}`;
+      ${covLineHTML(e, fmtShort(e.date))}
+      <figure><div class="photo">${img(p.url, '新聞照片', e.title)}</div>
+        ${p.credit ? `<figcaption>照片：${esc(p.credit)}${p.source ? ` · <a href="${esc(p.source)}" target="_blank" rel="noopener">原文</a>` : ''}</figcaption>` : ''}</figure>
+    </div>
+    ${body}
+  </div>`;
 }
 
-const STATUS_ORDER = ['🔍 待證據','🕐 久未舉證','✅ 屬實','❌ 不實','✂️ 斷章取義','⚠️ 誤導'];
+const STATUS_ORDER = CLAIM_MARKS.filter(k => k !== '💬');
 async function viewClaims(){
   const all = (await getClaims()).claims;
   const f = state.cf;
   const present = [...new Set(all.map(c => c.status).filter(Boolean))];
-  const statuses = ['全部', ...STATUS_ORDER.filter(s => present.includes(s)), ...present.filter(s => !STATUS_ORDER.includes(s))];
+  const rank = s => { const i = STATUS_ORDER.indexOf(markKey(s)); return i < 0 ? 99 : i; };
+  const statuses = ['全部', ...present.sort((a, b) => rank(a) - rank(b))];
   const speakers = [...new Set(all.map(c => c.speaker).filter(Boolean))].sort();
   const parties = [...new Set(all.map(c => c.party).filter(Boolean))].sort();
   const list = all.filter(c => (f.status === '全部' || c.status === f.status) && (!f.speaker || c.speaker === f.speaker) && (!f.party || c.party === f.party));
@@ -377,12 +739,12 @@ async function viewClaims(){
     <section style="display:flex;flex-direction:column;gap:6px">
       <h1 class="h1">查證追蹤</h1>
       <p class="date">每一條需要查證的說法和目前狀態。只呈現說法與證據，不做排行。</p>
-      ${legendHTML()}
+      <a class="morelink" href="#principles">標記是什麼意思？看「原則」頁 →</a>
     </section>
     <section class="filters">
       <div class="chips" aria-label="依狀態篩選">${statuses.map(s => {
         const n = s === '全部' ? all.length : all.filter(c => c.status === s).length;
-        return `<button class="chip" data-cstatus="${esc(s)}" aria-pressed="${f.status === s}">${esc(s)}<small>${n}</small></button>`; }).join('')}</div>
+        return `<button class="chip" data-cstatus="${esc(s)}" aria-pressed="${f.status === s}">${esc(s === '全部' ? s : labelOf(s))}<small>${n}</small></button>`; }).join('')}</div>
       <div class="selects">
         <label for="fSpeaker">發言者<select id="fSpeaker" data-cfield="speaker">${['', ...speakers].map(v => opt(v, f.speaker)).join('')}</select></label>
         <label for="fParty">政黨／身分<select id="fParty" data-cfield="party">${['', ...parties].map(v => opt(v, f.party)).join('')}</select></label>
@@ -390,7 +752,7 @@ async function viewClaims(){
     </section>
     <section class="list">${list.map(c => `
       <article class="claim">
-        <div class="pills"><span class="pill ${claimCls(c.status)}" title="${esc(legendTip(c.status))}">${esc(c.status || '未標示')}</span>${c.spread ? `<span class="pill line">擴散：${esc(c.spread)}</span>` : ''}</div>
+        <div class="pills">${statusPill(c.status) || '<span class="pill s-wait">未標示</span>'}${c.spread ? `<span class="pill line">擴散：${esc(c.spread)}</span>` : ''}</div>
         <h3>${esc(c.claim)}</h3>
         <p class="who">${esc(c.speaker || '')}${c.party ? ` · ${esc(c.party)}` : ''}${c.saidOn ? ` · ${fmtShort(c.saidOn)} 發言` : ''}</p>
         ${c.quote ? `<q>原話：${esc(c.quote)}</q>` : ''}
@@ -416,10 +778,26 @@ async function viewArchive(){
       || '<p class="empty">還沒有歸檔。</p>'}</section>`;
 }
 
+function legendSection(){
+  const dl = (keys, ev) => `<dl>${keys.map(k => { const [e, l, c, d] = (ev && EVENT_LABEL[k]) || LABELS[k]; return `<dt><span class="pill ${c}">${e} ${l}</span></dt><dd>${esc(d)}</dd>`; }).join('')}</dl>`;
+  return `<section class="sec"><h2>標記說明</h2><div class="legend2">
+    <div><h3>整則事件的查證狀態</h3>${dl(EVENT_MARKS, true)}</div>
+    <div><h3>單一說法的標記</h3>${dl(CLAIM_MARKS)}</div>
+    <div><h3>媒體立場</h3><dl>
+      <dt><span class="pill l-green">偏綠</span></dt><dd>一般認為立場較接近民進黨的媒體</dd>
+      <dt><span class="pill l-blue">偏藍</span></dt><dd>一般認為立場較接近國民黨的媒體</dd>
+      <dt><span class="pill l-neutral">中立</span></dt><dd>通訊社、公共媒體等作為比對基準的媒體</dd></dl>
+      <p class="date" style="margin-top:8px">每則新聞會分開搜尋各立場的媒體。「比對 7 家媒體，其中 6 家自己採訪」的意思是：7 家有報導，但有 1 家只是轉載別家的稿子，所以實際只算 6 個來源。</p></div>
+  </div></section>`;
+}
 async function viewPrinciples(){
   const p = await getPrinciples();
+  const secs = p.sections.filter(s => s.title !== '說法分類');
+  const first = secs.findIndex(s => s.title === '編輯原則');
+  const parts = secs.map(s => `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`);
+  parts.splice(first < 0 ? 0 : first + 1, 0, legendSection());
   return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">編輯原則</h1><p class="date">這個平台怎麼比對、怎麼分類。</p></section>
-    ${p.sections.map(s => `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`).join('')}`;
+    ${parts.join('')}`;
 }
 
 /* ---------- 網址：#today、#d-日期、#e-日期-ID、#claims、#archive、#principles ---------- */
