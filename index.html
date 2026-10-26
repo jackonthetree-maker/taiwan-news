@@ -97,6 +97,10 @@ p{margin:0}
 figure{margin:0;display:flex;flex-direction:column;gap:6px}
 figcaption{font-size:12px;color:var(--muted)}
 .ttl{font-family:var(--serif);font-size:24px;line-height:1.45;font-weight:700}
+.legend-box{border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:14px}
+.legend-box summary{cursor:pointer;font-weight:600;color:var(--fg2);min-height:28px;display:flex;align-items:center}
+.legend-box dl{margin:10px 0 2px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 10px;align-items:center}
+.legend-box dd{margin:0;color:var(--fg2);line-height:1.6}
 .gapbox{font-size:13.5px;color:var(--mid);background:var(--mid-bg);border-radius:12px;padding:10px 12px}
 .sec{display:flex;flex-direction:column;gap:10px}
 .sec > h2{font-size:17px;font-weight:700}
@@ -186,6 +190,18 @@ const checkCls = s => pick(CHECK, s) || 's-wait';
 const claimCls = s => pick(CLAIM, s) || 's-wait';
 /* 內文裡的說法標記：✅ 事實、🔍 待證據、💬 觀點 用不同顏色 */
 const MARKS = [['✅','事實','s-ok'],['🔍','待證據','s-mid'],['💬','觀點','s-view'],['⚠️','誤導','s-cut'],['❌','不實','s-bad'],['✂️','斷章取義','s-cut']];
+/* 圖示說明（與 Notion 主頁「說法分類」「查證結果圖示」一致） */
+const LEGEND = [
+  ['✅','事實／屬實','有證據證明是對的','s-ok'],
+  ['🔍','待證據','還沒有證據證明真假','s-mid'],
+  ['💬','觀點','解讀或評價，本來就沒有真假','s-view'],
+  ['⚠️','誤導','沒造假，但標題或數字的寫法讓人誤會','s-cut'],
+  ['✂️','斷章取義','原話是真的，但剪掉前後文，意思被扭曲','s-cut'],
+  ['❌','不實','有證據證明是錯的','s-bad'],
+  ['🕐','久未舉證','超過 30 天沒人拿出證據（不等於假的）','s-wait']
+];
+const legendTip = s => { const l = LEGEND.find(([e]) => (s || '').startsWith(e)); return l ? l[2] : ''; };
+const legendHTML = () => `<details class="legend-box"><summary>標記是什麼意思？</summary><dl>${LEGEND.map(([e, n, d, c]) => `<dt><span class="pill ${c}">${e} ${n}</span></dt><dd>${d}</dd>`).join('')}</dl></details>`;
 const LEAN = { green:['偏綠','l-green'], blue:['偏藍','l-blue'], neutral:['中立','l-neutral'] };
 
 const I = {
@@ -212,7 +228,7 @@ function withMark(rs){
   const m = MARKS.find(([e]) => first.startsWith(e));
   if (!m) return runsHTML(rs);
   const rest = [{ ...rs[0], x: first.slice(m[0].length).trimStart() }, ...rs.slice(1)];
-  return `<span class="pill mark ${m[2]}">${m[1]}</span>` + runsHTML(rest);
+  return `<span class="pill mark ${m[2]}" title="${esc(legendTip(m[0]))}">${m[1]}</span>` + runsHTML(rest);
 }
 function nodesHTML(nodes){
   let html = '', i = 0;
@@ -288,7 +304,7 @@ async function viewDay(date, isToday){
 
 function claimsMini(list){
   return `<section class="sec"><h2>這則事件的查證追蹤</h2>${list.map(c => `
-    <div class="claim"><div class="pills"><span class="pill ${claimCls(c.status)}">${esc(c.status)}</span></div>
+    <div class="claim"><div class="pills"><span class="pill ${claimCls(c.status)}" title="${esc(legendTip(c.status))}">${esc(c.status)}</span></div>
       <h3>${esc(c.claim)}</h3><p class="who">${esc(c.speaker || '')}${c.party ? ` · ${esc(c.party)}` : ''}</p>
       ${c.needs && (c.status || '').startsWith('🔍') ? `<p class="who">需要的證據：${esc(c.needs)}${c.burden ? `（舉證：${esc(c.burden)}）` : ''}</p>` : ''}
     </div>`).join('')}<a class="chip" style="align-self:flex-start" href="#claims">看全部查證追蹤</a></section>`;
@@ -342,6 +358,7 @@ async function viewEvent(date, id){
       <h1 class="ttl">${esc(e.title)}</h1>
       <p class="tags">${meta.map(m => `<span>${m}</span>`).join('')}</p>
       ${e.gap ? `<p class="gapbox">立場缺口：${esc(e.gap)}</p>` : ''}
+      ${legendHTML()}
     </section>
     ${body}`;
 }
@@ -360,6 +377,7 @@ async function viewClaims(){
     <section style="display:flex;flex-direction:column;gap:6px">
       <h1 class="h1">查證追蹤</h1>
       <p class="date">每一條需要查證的說法和目前狀態。只呈現說法與證據，不做排行。</p>
+      ${legendHTML()}
     </section>
     <section class="filters">
       <div class="chips" aria-label="依狀態篩選">${statuses.map(s => {
@@ -372,7 +390,7 @@ async function viewClaims(){
     </section>
     <section class="list">${list.map(c => `
       <article class="claim">
-        <div class="pills"><span class="pill ${claimCls(c.status)}">${esc(c.status || '未標示')}</span>${c.spread ? `<span class="pill line">擴散：${esc(c.spread)}</span>` : ''}</div>
+        <div class="pills"><span class="pill ${claimCls(c.status)}" title="${esc(legendTip(c.status))}">${esc(c.status || '未標示')}</span>${c.spread ? `<span class="pill line">擴散：${esc(c.spread)}</span>` : ''}</div>
         <h3>${esc(c.claim)}</h3>
         <p class="who">${esc(c.speaker || '')}${c.party ? ` · ${esc(c.party)}` : ''}${c.saidOn ? ` · ${fmtShort(c.saidOn)} 發言` : ''}</p>
         ${c.quote ? `<q>原話：${esc(c.quote)}</q>` : ''}
