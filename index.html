@@ -145,7 +145,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .day p{font-size:13.5px;color:var(--fg2);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--bg);border-top:1px solid var(--line);padding-top:8px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.nav div{max-width:600px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+.nav div{max-width:600px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
 .nav a{min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted);text-decoration:none}
 .nav a svg{width:22px;height:22px}
 .nav a[aria-current="page"]{color:var(--fg);font-weight:700}
@@ -506,7 +506,7 @@ async function viewDay(date, isToday){
   return `
     ${idx.preview ? '<p class="note">預覽資料：每日自動同步還沒開始。</p>' : ''}
     <div class="daybar">
-      ${isToday ? '' : `<a class="iconbtn" href="#archive" aria-label="回到歸檔">${I.back}</a>`}
+      ${isToday ? '' : `<a class="iconbtn" href="#today" data-back aria-label="返回">${I.back}</a>`}
       <p class="date">${fmtDay(d.date)}${d.coverage ? ` · 涵蓋 ${esc(d.coverage)}` : ''}</p>
     </div>
     ${d.illustration ? `<div class="hero">${img(d.illustration, '', '今日插畫')}</div>` : ''}
@@ -752,7 +752,7 @@ async function viewEvent(date, id){
   if (prior || e.prior.length || e.issues.length) body += sec('前情', `
     ${e.issues.map(i => `<span class="series">系列：${esc(i.name)}</span>`).join('')}
     ${prior ? `<div class="rich">${nodesHTML(prior.body)}</div>` : ''}
-    ${e.prior.length ? `<div class="prior">${e.prior.map(p => `<a href="#d-${p.date}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}`, 'bg');
+    ${e.prior.length ? `<div class="prior">${e.prior.map(p => `<a href="#e-${p.date}-${p.id}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}`, 'bg');
   const facts = get('已確認的事實');
   if (facts && facts.body.length) body += sec(facts.title, factsHTML(facts.body, e));
   body += whoSaysHTML(e, get('各方說法'), get('各家報導的差異'));
@@ -771,7 +771,7 @@ async function viewEvent(date, id){
   const p = e.photo || {};
   return `<div class="ev">
     <div class="ev-head">
-      <a class="iconbtn" href="#d-${e.date}" aria-label="回到 ${fmtShort(e.date)} 的事件列表">${I.back}</a>
+      <a class="iconbtn" href="#d-${e.date}" data-back aria-label="返回">${I.back}</a>
       <div class="pills">${statusPills(e)}</div>
       <h1 class="ttl">${esc(e.title)}</h1>
       ${covLineHTML(e, fmtShort(e.date))}
@@ -867,17 +867,18 @@ async function viewPrinciples(){
 }
 
 /* ---------- 網址：#today、#d-日期、#e-日期-ID、#claims、#archive、#principles ---------- */
-const NAV = [['today','今日',I.today],['claims','查證',I.claims],['archive','歸檔',I.archive],['principles','說明',I.rules]];
+const NAV = [['today','今日',I.today],['claims','查證',I.claims],['principles','說明',I.rules]];
 let lastRoute = '';
+const trail = [];
 async function route(){
   const h = location.hash.slice(1) || 'today';
   let tab = 'today', html, m;
   subnavHTML = '';
   try {
-    if ((m = h.match(/^e-(\d{4}-\d{2}-\d{2})-([0-9a-f]+)$/))) { tab = m[1] === (await getIndex()).latest ? 'today' : 'archive'; html = await viewEvent(m[1], m[2]); }
-    else if ((m = h.match(/^d-(\d{4}-\d{2}-\d{2})$/))) { const t = m[1] === (await getIndex()).latest; tab = t ? 'today' : 'archive'; html = await viewDay(m[1], t); }
+    if ((m = h.match(/^e-(\d{4}-\d{2}-\d{2})-([0-9a-f]+)$/))) { tab = m[1] === (await getIndex()).latest ? 'today' : ''; html = await viewEvent(m[1], m[2]); }
+    else if ((m = h.match(/^d-(\d{4}-\d{2}-\d{2})$/))) { const t = m[1] === (await getIndex()).latest; tab = t ? 'today' : ''; html = await viewDay(m[1], t); }
     else if (h === 'claims') { tab = 'claims'; html = await viewClaims(); }
-    else if (h === 'archive') { tab = 'archive'; html = await viewArchive(); }
+    else if (h === 'archive') { tab = ''; html = await viewArchive(); }
     else if (h === 'principles') { tab = 'principles'; html = await viewPrinciples(); }
     else html = await viewDay(null, true);
   } catch(err){
@@ -889,11 +890,13 @@ async function route(){
   document.getElementById('top').classList.toggle('with-tabs', !!subnavHTML);
   document.getElementById('nav').innerHTML = NAV.map(([k,l,ic]) =>
     `<a href="#${k}" ${k === tab ? 'aria-current="page"' : ''}>${ic}${l}</a>`).join('');
-  if (h !== lastRoute) window.scrollTo(0, 0);
+  if (h !== lastRoute) { window.scrollTo(0, 0); trail.push(h); }
   lastRoute = h;
 }
 
 document.addEventListener('click', e => {
+  const back = e.target.closest('[data-back]');
+  if (back && trail.length > 1) { e.preventDefault(); trail.pop(); history.back(); return; }
   const t = e.target.closest('[data-cat],[data-cstatus]');
   if (!t) return;
   if (t.dataset.cat) { state.cat = t.dataset.cat; route().then(() => window.scrollTo(0, 0)); return; }
