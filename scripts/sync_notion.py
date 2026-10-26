@@ -363,7 +363,6 @@ def build(api, save_images=True):
             "summary": prop(p, "一句話摘要"),
             "category": prop(p, "類別"),
             "subcategories": prop(p, "子類別") or [],
-            "nature": prop(p, "內容性質"),
             "primaryNature": prop(p, "主要性質"),
             "secondaryNature": prop(p, "次要性質"),
             "check": prop(p, "查證狀態"),
