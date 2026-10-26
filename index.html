@@ -346,7 +346,7 @@ async function viewEvent(date, id){
     ${body}`;
 }
 
-const STATUS_ORDER = ['🔍 待證據','🕐 久未舉證','✅ 已證實','❌ 不實','✂️ 斷章取義','⚠️ 部分正確'];
+const STATUS_ORDER = ['🔍 待證據','🕐 久未舉證','✅ 屬實','❌ 不實','✂️ 斷章取義','⚠️ 誤導'];
 async function viewClaims(){
   const all = (await getClaims()).claims;
   const f = state.cf;
