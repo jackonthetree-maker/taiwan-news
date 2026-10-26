@@ -269,6 +269,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .srcgroup a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;min-height:44px;padding-block:6px;border-bottom:1px solid var(--line);text-decoration:none;font-size:14px;line-height:1.5}
 .srcgroup a b{display:block;font-size:13px;color:var(--muted);font-weight:500}
 .srcnote{font-size:13px;color:var(--muted);line-height:1.6}
+.say .by{font-size:12.5px;color:var(--muted);margin-top:-2px}
 </style>
 </head>
 <body>
@@ -290,7 +291,7 @@ async function getJSON(path){
   return cache[path] = await r.json();
 }
 const getIndex = () => getJSON('data/index.json');
-const getDay = d => getJSON(`data/days/${d}.json`);
+const getDay = d => getJSON(`preview-data/days/${d}.json`).catch(() => getJSON(`data/days/${d}.json`));
 const getClaims = () => getJSON('data/claims.json');
 const getPrinciples = () => getJSON('data/principles.json');
 
@@ -495,8 +496,10 @@ function needHTML(rs){
 }
 function sayHTML(rs){
   const txt = runsText(rs), i = txt.indexOf('→');
-  const [main, tail] = i > 0 ? splitAt(rs, i) : [rs, []];
-  return `<div class="say">${withMark(main)}${tail.length ? `<div class="need">${needHTML(tail)}</div>` : ''}</div>`;
+  let [main, tail] = i > 0 ? splitAt(rs, i) : [rs, []], by = '';
+  const mt = runsText(main), m = mt.match(/（([^（）]{1,40})）\s*。?\s*$/);
+  if (m && m[1].split(/[、，,]/).every(t => isOutlet(t, []))) { main = splitAt(main, m.index)[0]; by = m[1]; }
+  return `<div class="say">${withMark(main)}${by ? `<span class="by">來源：${esc(by)}</span>` : ''}${tail.length ? `<div class="need">${needHTML(tail)}</div>` : ''}</div>`;
 }
 function speakersHTML(nodes){
   const groups = [], byName = {};
