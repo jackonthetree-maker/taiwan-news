@@ -420,14 +420,28 @@ function nodesHTML(nodes){
 
 const img = (url, label, alt) => url
   ? `<img src="${esc(url)}" alt="${esc(alt || '')}" loading="lazy" data-fallback="${esc(label)}">` : esc(label);
-const NATURE = { '🔀 混合':'🔀 政策＋選戰' };
+/* 內容性質：主要＋次要（新欄位）；舊資料退回讀「內容性質」 */
+const NATURE_TYPES = [['📌','📌','政策','法案、預算、制度、判決，會改變生活規則'],['📊','📊','數字','官方統計、災情、調查結果'],
+  ['🗣','🗣️','爭議','爆料、指控、互相否認，重點在誰說得對'],['⚔','⚔️','選戰','候選人攻防、失言、互批']];
+const OLD_NATURE = { '📌':['📌 政策',0], '⚔':['⚔️ 選戰',3], '🔀':['🔀 政策＋選戰',2] };
+const natureType = s => { const t = String(s || '').replace(/\uFE0F/g, ''); return NATURE_TYPES.findIndex(([k]) => t.startsWith(k)); };
+const natureName = s => { const i = natureType(s); return i < 0 ? String(s || '') : `${NATURE_TYPES[i][1]} ${NATURE_TYPES[i][2]}`; };
+const oldNature = e => { const t = String(e.nature || '').replace(/\uFE0F/g, ''); const k = Object.keys(OLD_NATURE).find(x => t.startsWith(x)); return k ? OLD_NATURE[k] : null; };
+const natureLabel = e => {
+  if (e.primaryNature) {
+    const sec = e.secondaryNature && natureType(e.secondaryNature) !== natureType(e.primaryNature) ? '＋' + natureName(e.secondaryNature) : '';
+    return natureName(e.primaryNature) + sec;
+  }
+  const o = oldNature(e); return o ? o[0] : (e.nature || '');
+};
+const naturePill = e => { const l = natureLabel(e); return l ? `<span class="pill line">${esc(l)}</span>` : ''; };
 const statusPills = (e, hideCat) => {
   const pend = markKey(e.check) === '✅' ? pendingCount(e) : 0;
   return `
   ${e.category && !hideCat ? `<span class="pill">${esc(e.category)}</span>` : ''}
   ${e.check ? statusPill(e.check, true) : ''}
   ${pend ? `<span class="pill s-mid" title="這則裡還沒有證據的說法">🔍 ${pend} 項待證據</span>` : ''}
-  ${e.nature ? `<span class="pill line">${esc(NATURE[e.nature] || e.nature)}</span>` : ''}`;
+  ${naturePill(e)}`;
 };
 
 /* ---------- 畫面 ---------- */
@@ -435,9 +449,8 @@ const state = { cat:'全部', cf:{ status:'全部', speaker:'', party:'' } };
 const $view = document.getElementById('view');
 let subnavHTML = '';
 /* 排列順序：性質 → 查證狀態 → Notion 排序（不依報導家數） */
-const NATURE_RANK = { '📌':0, '🔀':1, '⚔':2 };
 const CHECK_RANK = { '✅':0, '❌':1, '⚖':2, '⏳':3 };
-const natureRank = e => { const k = Object.keys(NATURE_RANK).find(x => (e.nature || '').startsWith(x)); return k ? NATURE_RANK[k] : 3; };
+const natureRank = e => { if (e.primaryNature) { const i = natureType(e.primaryNature); return i < 0 ? 4 : i; } const o = oldNature(e); return o ? o[1] : 4; };
 const checkRank = e => { const k = markKey(e.check); return k in CHECK_RANK ? CHECK_RANK[k] : 4; };
 const byPriority = (a, b) => natureRank(a) - natureRank(b) || checkRank(a) - checkRank(b) || (a.order ?? 99) - (b.order ?? 99);
 
@@ -448,7 +461,7 @@ function eventCard(e){
   tags.push(`<span class="covmini" aria-label="偏綠 ${cv.green.length} 家、中立 ${cv.neutral.length} 家、偏藍 ${cv.blue.length} 家">${
     [['green','g','綠'],['neutral','n','中'],['blue','b','藍']].map(([k, c, l]) => `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('')}</span>`);
   return `<a class="card" href="#e-${e.date}-${e.id}">
-    <div class="pills">${e.nature ? `<span class="pill line">${esc(NATURE[e.nature] || e.nature)}</span>` : ''}</div>
+    <div class="pills">${naturePill(e)}</div>
     <div class="main">
       <div style="min-width:0"><h3>${esc(e.title)}</h3>${e.summary ? `<p>${esc(e.summary)}</p>` : ''}</div>
       <div class="thumb">${img(e.photo && e.photo.url, '照片', e.title)}</div>
@@ -809,6 +822,8 @@ function legendSection(){
   return `<section class="sec"><h2>標記說明</h2><div class="legend2">
     <div>${dl(['✅','❌','⚖','⏳','🔍','💬','⚠','✂','🕐'])}
       <p class="date" style="margin-top:8px">文章最上面的標記是整則事件的總結，例如「✅ 經過已證實」表示事件經過（誰、何時、做了什麼）已證實；文章裡每一句說法另外各有標記。</p></div>
+    <div><h3>內容性質</h3><dl>${NATURE_TYPES.map(([, e, l, d]) => `<dt><span class="pill line">${e} ${l}</span></dt><dd>${esc(d)}</dd>`).join('')}</dl>
+      <p class="date" style="margin-top:8px">每則選一個主要性質，有需要時再加一個次要性質，例如「🗣️ 爭議＋⚔️ 選戰」。</p></div>
     <div><h3>媒體立場</h3><dl>
       <dt><span class="pill l-green">偏綠</span></dt><dd>一般認為立場較接近民進黨的媒體</dd>
       <dt><span class="pill l-blue">偏藍</span></dt><dd>一般認為立場較接近國民黨的媒體</dd>
@@ -825,8 +840,8 @@ async function viewPrinciples(){
   const parts = secs.map(s => `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`);
   parts.splice(first < 0 ? 0 : first + 1, 0, legendSection(), `<section class="sec"><h2>排列順序</h2><div class="rich">
     <p>每個分類裡的新聞依固定規則排列，不另外由人工挑選「重點」：</p>
-    <ol><li>先看性質：📌 實質政策 → 🔀 政策＋選戰 → ⚔️ 選戰攻防</li>
-    <li>性質相同時，查證越確定越前面：✅ 經過已證實 → ❌ 有誤 → ⚖️ 各說各話 → ⏳ 待確認</li>
+    <ol><li>先看主要性質：📌 政策 → 📊 數字 → 🗣️ 爭議 → ⚔️ 選戰（次要性質不影響排序）</li>
+    <li>主要性質相同時，查證越確定越前面：✅ 經過已證實 → ❌ 有誤 → ⚖️ 各說各話 → ⏳ 待確認</li>
     <li>以上都相同時，依編輯排定的順序。</li></ol>
     <p>不依報導家數排列：報導多寡反映的是媒體的關注度，不等於對讀者的重要性。</p></div></section>`);
   return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">編輯原則</h1><p class="date">這個平台怎麼比對、怎麼分類。</p></section>
