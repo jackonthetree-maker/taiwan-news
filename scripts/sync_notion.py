@@ -389,7 +389,7 @@ def build(api, save_images=True):
             "events": evs,
         }
         write(DATA / "days" / f"{date}.json", day)
-        index_days.append({"date": date, "title": day["title"], "count": len(evs), "lead": (day["top3"] or [""])[0]})
+        index_days.append({"date": date, "title": day["title"], "count": len(evs), "lead": (day["top3"] or [e["title"] for e in evs] or [""])[0]})
 
     index_days.sort(key=lambda x: x["date"], reverse=True)
 

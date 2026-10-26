@@ -433,6 +433,12 @@ const statusPills = (e, hideCat) => {
 const state = { cat:'全部', cf:{ status:'全部', speaker:'', party:'' } };
 const $view = document.getElementById('view');
 let subnavHTML = '';
+/* 排列順序：性質 → 查證狀態 → Notion 排序（不依報導家數） */
+const NATURE_RANK = { '📌':0, '🔀':1, '⚔':2 };
+const CHECK_RANK = { '✅':0, '❌':1, '⚖':2, '⏳':3 };
+const natureRank = e => { const k = Object.keys(NATURE_RANK).find(x => (e.nature || '').startsWith(x)); return k ? NATURE_RANK[k] : 3; };
+const checkRank = e => { const k = markKey(e.check); return k in CHECK_RANK ? CHECK_RANK[k] : 4; };
+const byPriority = (a, b) => natureRank(a) - natureRank(b) || checkRank(a) - checkRank(b) || (a.order ?? 99) - (b.order ?? 99);
 
 function eventCard(e){
   const tags = [];
@@ -440,8 +446,8 @@ function eventCard(e){
   const cv = coverage(e);
   tags.push(`<span class="covmini" aria-label="偏綠 ${cv.green.length} 家、中立 ${cv.neutral.length} 家、偏藍 ${cv.blue.length} 家">${
     [['green','g','綠'],['neutral','n','中'],['blue','b','藍']].map(([k, c, l]) => `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('')}</span>`);
-  return `<a class="card${e.highlight ? ' hl' : ''}" href="#e-${e.date}-${e.id}">
-    <div class="pills">${statusPills(e, true)}${e.highlight ? '<span class="pill star" title="新聞整理標為當天重點">★ 重點</span>' : ''}</div>
+  return `<a class="card" href="#e-${e.date}-${e.id}">
+    <div class="pills">${statusPills(e, true)}</div>
     <div class="main">
       <div style="min-width:0"><h3>${esc(e.title)}</h3>${e.summary ? `<p>${esc(e.summary)}</p>` : ''}</div>
       <div class="thumb">${img(e.photo && e.photo.url, '照片', e.title)}</div>
@@ -459,7 +465,7 @@ async function viewDay(date, isToday){
   const present = [...new Set(d.events.map(e => e.category).filter(Boolean))];
   const cats = [...CAT_ORDER.filter(c => present.includes(c)), ...present.filter(c => !CAT_ORDER.includes(c))];
   if (!cats.includes(state.cat)) state.cat = cats[0];
-  const shown = d.events.filter(e => e.category === state.cat);
+  const shown = d.events.filter(e => e.category === state.cat).sort(byPriority);
   subnavHTML = `<nav class="cattabs" aria-label="新聞類別">${cats.map(c => {
       const n = d.events.filter(e => e.category === c).length;
       return `<button class="cattab" data-cat="${esc(c)}" aria-pressed="${state.cat === c}">${esc(c)}<small>${n}</small></button>`;
@@ -814,7 +820,12 @@ async function viewPrinciples(){
   const secs = p.sections.filter(s => s.title !== '說法分類');
   const first = secs.findIndex(s => s.title === '編輯原則');
   const parts = secs.map(s => `<section class="sec"><h2>${esc(s.title)}</h2><div class="rich">${nodesHTML(s.body)}</div></section>`);
-  parts.splice(first < 0 ? 0 : first + 1, 0, legendSection());
+  parts.splice(first < 0 ? 0 : first + 1, 0, legendSection(), `<section class="sec"><h2>排列順序</h2><div class="rich">
+    <p>每個分類裡的新聞依固定規則排列，不另外由人工挑選「重點」：</p>
+    <ol><li>先看性質：📌 實質政策 → 🔀 政策＋選戰 → ⚔️ 選戰攻防</li>
+    <li>性質相同時，查證越確定越前面：✅ 經過已證實 → ❌ 有誤 → ⚖️ 各說各話 → ⏳ 待確認</li>
+    <li>以上都相同時，依編輯排定的順序。</li></ol>
+    <p>不依報導家數排列：報導多寡反映的是媒體的關注度，不等於對讀者的重要性。</p></div></section>`);
   return `<section style="display:flex;flex-direction:column;gap:6px"><h1 class="h1">編輯原則</h1><p class="date">這個平台怎麼比對、怎麼分類。</p></section>
     ${parts.join('')}`;
 }
