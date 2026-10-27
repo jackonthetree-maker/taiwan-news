@@ -133,6 +133,10 @@ def urls_in(text):
     return URL_RE.findall(text or "")
 
 
+# 舊類別 → 新的 4 類（Notion 選項改完後舊資料也照新分類顯示）
+CATEGORY_ALIAS = {"社會": "社會・生活", "經濟": "財經・科技", "科技產業": "財經・科技"}
+
+
 def lines(text):
     return [l.strip() for l in (text or "").splitlines() if l.strip()]
 
@@ -356,7 +360,7 @@ def build(api, save_images=True):
             "order": prop(p, "排序") if prop(p, "排序") is not None else 99,
             "title": prop(p, "事件標題"),
             "summary": prop(p, "一句話摘要"),
-            "category": prop(p, "類別"),
+            "category": CATEGORY_ALIAS.get(prop(p, "類別"), prop(p, "類別")),
             "subcategories": prop(p, "子類別") or [],
             "primaryNature": prop(p, "主要性質"),
             "secondaryNature": prop(p, "次要性質"),
