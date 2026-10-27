@@ -287,6 +287,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .cattabs::-webkit-scrollbar{display:none}
 .cattab{flex:0 0 auto;min-height:44px;padding:0 12px;border:0;background:none;font-size:15.5px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2.5px solid transparent;display:inline-flex;align-items:center;gap:5px}
 .cattab small{font-size:12px;opacity:.75}
+.cattab.zero{opacity:.45}
 .cattab[aria-pressed="true"]{color:var(--fg);font-weight:700;border-bottom-color:var(--fg)}
 .top{padding-block:12px 0}
 .daybar{display:flex;align-items:center;gap:10px}
@@ -501,12 +502,12 @@ async function viewDay(date, isToday){
   const d = await getDay(date);
   const CAT_ORDER = ['政治','社會・生活','國際','財經・科技'];
   const present = [...new Set(d.events.map(e => e.category).filter(Boolean))];
-  const cats = [...CAT_ORDER.filter(c => present.includes(c)), ...present.filter(c => !CAT_ORDER.includes(c))];
+  const cats = [...CAT_ORDER, ...present.filter(c => !CAT_ORDER.includes(c))];  // 4 類固定顯示，當天沒有的顯示 0
   if (!cats.includes(state.cat)) state.cat = cats[0];
   const shown = d.events.filter(e => e.category === state.cat).sort(byPriority);
   subnavHTML = `<nav class="cattabs" aria-label="新聞類別">${cats.map(c => {
       const n = d.events.filter(e => e.category === c).length;
-      return `<button class="cattab" data-cat="${esc(c)}" aria-pressed="${state.cat === c}">${esc(c)}<small>${n}</small></button>`;
+      return `<button class="cattab${n ? '' : ' zero'}" data-cat="${esc(c)}" aria-pressed="${state.cat === c}">${esc(c)}<small>${n}</small></button>`;
     }).join('')}</nav>`;
   return `
     ${idx.preview ? '<p class="note">預覽資料：每日自動同步還沒開始。</p>' : ''}
@@ -516,7 +517,7 @@ async function viewDay(date, isToday){
     </div>
     ${d.illustration ? `<div class="hero">${img(d.illustration, '', '今日插畫')}</div>` : ''}
     ${d.followUps && d.followUps.length ? `<section class="follow"><h2 class="h2">📌 追蹤更新</h2><ul>${d.followUps.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>` : ''}
-    <section class="list" aria-label="${esc(state.cat)}新聞">${shown.map(eventCard).join('') || '<p class="empty">這個類別沒有事件。</p>'}</section>`;
+    <section class="list" aria-label="${esc(state.cat)}新聞">${shown.map(eventCard).join('') || '<p class="empty">這段時間沒有這類值得收的新聞。</p>'}</section>`;
 }
 
 /* 各立場有哪些媒體報導（同一家多篇只算一次） */
