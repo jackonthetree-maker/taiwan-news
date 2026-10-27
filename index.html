@@ -764,9 +764,10 @@ async function viewEvent(date, id){
   const sec = (title, inner, cls = '') => `<section class="sec ${cls}"><h2>${esc(title)}</h2>${inner}</section>`;
 
   /* 第一層：30 秒看懂 */
-  const lead = get('一句話看懂'), think = get('看完你可以怎麼想');
+  const lead = get('一句話看懂'), why = get('跟你有什麼關係'), think = get('看完你可以怎麼想');
   let body = `<section class="summary">
     <div><h2>一句話看懂</h2>${lead ? `<div class="rich">${nodesHTML(lead.body)}</div>` : `<div class="rich"><p>${esc(e.summary || '')}</p></div>`}</div>
+    ${why && why.body.length ? `<div class="think"><h2>跟你有什麼關係</h2><div class="rich">${nodesHTML(why.body)}</div></div>` : ''}
     ${think && think.body.length ? `<div class="think"><h2>你可以這樣想</h2><div class="rich">${nodesHTML(think.body)}</div></div>` : ''}
   </section>`;
 
@@ -779,7 +780,7 @@ async function viewEvent(date, id){
   const facts = get('已確認的事實');
   if (facts && facts.body.length) body += sec(facts.title, factsHTML(facts.body, e));
   body += whoSaysHTML(e, get('各方說法'), get('各家報導的差異'));
-  const known = ['一句話看懂','看完你可以怎麼想','前情','已確認的事實','各方說法','各家報導的差異','查證說明','來源'];
+  const known = ['一句話看懂','跟你有什麼關係','看完你可以怎麼想','前情','已確認的事實','各方說法','各家報導的差異','查證說明','來源'];
   for (const s of secs) if (!known.some(o => s.title.startsWith(o)) && s.body.length) body += sec(s.title, `<div class="rich">${nodesHTML(s.body)}</div>`);
   if (!secs.length) body += '<p class="note">完整內文整理中。</p>';
 
