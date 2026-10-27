@@ -34,7 +34,9 @@ MAIN_PAGE = "4057fddd-d2f4-80c1-a14f-f4301db58d27"      # 新聞中立分析平�
 PRINCIPLE_SECTIONS = ["編輯原則", "說法分類", "不實說法處理", "選題原則"]
 PUBLISH_STATUS = {"已完成", "部分完成"}                 # 每日總覽「執行狀態」是這些才上網頁
 MAX_FOLLOWUPS = 5
-MAX_PRIOR = 5
+MAX_PRIOR = 3
+SMALL_ISSUE = 5          # 議題底下事件 ≤ 5 則算「小議題」，同系列都列進前情
+PARTIES = {"民進黨", "國民黨", "民眾黨", "時代力量", "台灣基進", "親民黨", "新黨"}  # 政黨太廣，不當作相關的依據
 PHOTO_WIDTH = 1200
 TZ = timezone(timedelta(hours=8))
 
@@ -324,6 +326,26 @@ def build(api, save_images=True):
                 published_days[date] = d
     published = {k for d in published_days.values() for k in day_ids(d)}
     ev_brief = {k: {"id": k, "date": prop(events[k], "日期"), "title": prop(events[k], "事件標題")} for k in published}
+
+    def key_people(pg):
+        return {x for x in (prop(pg, "涉及對象") or []) if x not in PARTIES}
+
+    def related_prior(k, p, date):
+        """前情：以前的事件裡，真的相關的才列。
+        小議題（事件少、主題集中）同系列的都算；大議題（例如整場選舉）或沒同議題時，要有共同的人物／機關才算。"""
+        mine, my_issues = key_people(p), set(prop(p, "議題") or [])
+        scored = []
+        for e in published:
+            b = ev_brief[e]
+            if e == k or not b["date"] or b["date"] >= date:
+                continue
+            shared_people = mine & key_people(events[e])
+            small_issue = any(i in issues and sum(x in published for x in issues[i]["events"]) <= SMALL_ISSUE
+                              for i in my_issues & set(prop(events[e], "議題") or []))
+            if shared_people or small_issue:
+                scored.append((len(shared_people) + (2 if small_issue else 0), b["date"], b))
+        scored.sort(key=lambda x: (x[0], x[1]), reverse=True)
+        return sorted([b for _, _, b in scored[:MAX_PRIOR]], key=lambda b: b["date"], reverse=True)
     issues = {nid(p["id"]): {"id": nid(p["id"]), "name": prop(p, "議題名稱"), "background": prop(p, "背景說明"),
                              "events": prop(p, "事件") or []} for p in issue_rows}
 
@@ -346,15 +368,9 @@ def build(api, save_images=True):
         first = (prop_urls or [s["url"] for s in srcs] or [""])[0]
         m = match_source(src_idx, first) if first else None
         photo = save_image(first, PHOTOS / date / f"{k}.webp") if save_images else ""
-        prior, iss = [], []
-        for i in prop(p, "議題") or []:
-            if i in issues:
-                iss.append({"id": i, "name": issues[i]["name"], "background": issues[i]["background"]})
-                for e in issues[i]["events"]:
-                    b = ev_brief.get(e)
-                    if b and e != k and b["date"] and b["date"] < date and b not in prior:
-                        prior.append(b)
-        prior.sort(key=lambda b: b["date"], reverse=True)
+        iss = [{"id": i, "name": issues[i]["name"], "background": issues[i]["background"]}
+               for i in (prop(p, "議題") or []) if i in issues]
+        prior = related_prior(k, p, date)
         return {
             "id": k, "date": date, "edited": edited,
             "order": prop(p, "排序") if prop(p, "排序") is not None else 99,
