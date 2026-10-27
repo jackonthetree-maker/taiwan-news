@@ -331,8 +331,8 @@ def build(api, save_images=True):
         return {x for x in (prop(pg, "涉及對象") or []) if x not in PARTIES}
 
     def related_prior(k, p, date):
-        """前情：以前的事件裡，真的相關的才列。
-        小議題（事件少、主題集中）同系列的都算；大議題（例如整場選舉）或沒同議題時，要有共同的人物／機關才算。"""
+        """前情：以前的事件裡，真的相關的才列（政黨不算共同對象）。
+        同一個小議題（例如同一場颱風）一定列；只有一個共同人物、又不同議題的不列（例如只是都提到某市長）。"""
         mine, my_issues = key_people(p), set(prop(p, "議題") or [])
         scored = []
         for e in published:
@@ -340,10 +340,13 @@ def build(api, save_images=True):
             if e == k or not b["date"] or b["date"] >= date:
                 continue
             shared_people = mine & key_people(events[e])
+            shared_issues = my_issues & set(prop(events[e], "議題") or [])
             small_issue = any(i in issues and sum(x in published for x in issues[i]["events"]) <= SMALL_ISSUE
-                              for i in my_issues & set(prop(events[e], "議題") or []))
-            if shared_people or small_issue:
-                scored.append((len(shared_people) + (2 if small_issue else 0), b["date"], b))
+                              for i in shared_issues)
+            # 分數：共同人物／機關每個 1 分，同議題 1 分，同一個小議題再加 2 分；2 分以上才列
+            score = len(shared_people) + (1 if shared_issues else 0) + (2 if small_issue else 0)
+            if score >= 2:
+                scored.append((score, b["date"], b))
         scored.sort(key=lambda x: (x[0], x[1]), reverse=True)
         return sorted([b for _, _, b in scored[:MAX_PRIOR]], key=lambda b: b["date"], reverse=True)
     issues = {nid(p["id"]): {"id": nid(p["id"]), "name": prop(p, "議題名稱"), "background": prop(p, "背景說明"),
