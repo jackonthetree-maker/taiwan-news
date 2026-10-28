@@ -33,7 +33,6 @@ DS = {
 MAIN_PAGE = "4057fddd-d2f4-80c1-a14f-f4301db58d27"      # 新聞中立分析平台
 PRINCIPLE_SECTIONS = ["編輯原則", "說法分類", "不實說法處理", "選題原則"]
 PUBLISH_STATUS = {"已完成", "部分完成"}                 # 每日總覽「執行狀態」是這些才上網頁
-MAX_FOLLOWUPS = 5
 MAX_PRIOR = 3
 SMALL_ISSUE = 5          # 議題底下事件 ≤ 5 則算「小議題」，同系列都列進前情
 PARTIES = {"民進黨", "國民黨", "民眾黨", "時代力量", "台灣基進", "親民黨", "新黨"}  # 政黨太廣，不當作相關的依據
@@ -408,7 +407,6 @@ def build(api, save_images=True):
             "title": prop(d, "日期標題"),
             "coverage": prop(d, "涵蓋時段"),
             "status": prop(d, "執行狀態"),
-            "followUps": lines(prop(d, "追蹤更新"))[:MAX_FOLLOWUPS],
             "illustration": (save_image(illo, ILLOS / f"{date}.webp") if (illo and save_images) else ""),
             "events": evs,
         }
@@ -436,6 +434,7 @@ def build(api, save_images=True):
             "needs": prop(c, "需要什麼證據"),
             "burden": prop(c, "舉證責任"),
             "checkedOn": prop(c, "最後檢查日"),
+            "progressOn": prop(c, "最近進展日"),   # 有新證據或新進展的那天（網頁標「今天更新」）
             "events": ev,
         })
     claims.sort(key=lambda c: (c["saidOn"] or "", c["checkedOn"] or ""), reverse=True)

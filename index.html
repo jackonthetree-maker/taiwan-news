@@ -61,8 +61,10 @@ p{margin:0}
 .hero{border-radius:22px;overflow:hidden;background:var(--illo);aspect-ratio:1/1;max-width:100%}
 .hero img{width:100%;height:100%;object-fit:cover;display:block}
 
-.follow{background:var(--soft);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
-.follow ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14.5px}
+.progress{display:flex;align-items:center;min-height:44px;padding:10px 14px;border-radius:14px;background:var(--soft);font-size:14.5px;font-weight:600;text-decoration:none;color:var(--fg)}
+.badge-new{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--fg);color:var(--bg);margin-left:6px;vertical-align:middle}
+.today{display:flex;flex-direction:column;gap:12px}
+.today > h2{font-size:15px;font-weight:700}
 
 .chips{display:flex;gap:8px;overflow-x:auto;margin-inline:-16px;padding-inline:16px;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
@@ -505,6 +507,8 @@ async function viewDay(date, isToday){
   const cats = [...CAT_ORDER, ...present.filter(c => !CAT_ORDER.includes(c))];  // 4 類固定顯示，當天沒有的顯示 0
   if (!cats.includes(state.cat)) state.cat = cats[0];
   const shown = d.events.filter(e => e.category === state.cat).sort(byPriority);
+  let progressN = 0;
+  if (date === idx.latest) { try { progressN = (await getClaims()).claims.filter(c => c.progressOn === date).length; } catch(err){} }
   subnavHTML = `<nav class="cattabs" aria-label="新聞類別">${cats.map(c => {
       const n = d.events.filter(e => e.category === c).length;
       return `<button class="cattab${n ? '' : ' zero'}" data-cat="${esc(c)}" aria-pressed="${state.cat === c}">${esc(c)}<small>${n}</small></button>`;
@@ -516,7 +520,7 @@ async function viewDay(date, isToday){
       <p class="date">${fmtDay(d.date)}${d.coverage ? ` · 涵蓋 ${esc(d.coverage)}` : ''}</p>
     </div>
     ${d.illustration ? `<div class="hero">${img(d.illustration, '', '今日插畫')}</div>` : ''}
-    ${d.followUps && d.followUps.length ? `<section class="follow"><h2 class="h2">📌 追蹤更新</h2><ul>${d.followUps.map(t => `<li>${esc(t)}</li>`).join('')}</ul></section>` : ''}
+    ${progressN ? `<a class="progress" href="#claims">🔍 有 ${progressN} 則查證今天有新進展 →</a>` : ''}
     <section class="list" aria-label="${esc(state.cat)}新聞">${shown.map(eventCard).join('') || '<p class="empty">這段時間沒有這類值得收的新聞。</p>'}</section>`;
 }
 
@@ -836,7 +840,10 @@ function groupByNews(list){
   return [...groups.values()].sort((a, b) => latest(b).localeCompare(latest(a)));
 }
 async function viewClaims(){
-  const all = (await getClaims()).claims;
+  const everything = (await getClaims()).claims;
+  const latestDay = (await getIndex()).latest;
+  const fresh = everything.filter(c => latestDay && c.progressOn === latestDay);   // 今天有新進展：不管有沒有結論都放最上面
+  const all = everything.filter(c => !fresh.includes(c));
   const by = k => all.filter(c => markKey(c.status) === k);
   const resolved = all.filter(c => RESOLVED.includes(markKey(c.status)))
     .sort((a, b) => (b.checkedOn || '').localeCompare(a.checkedOn || '') || (b.saidOn || '').localeCompare(a.saidOn || ''));
@@ -850,6 +857,9 @@ async function viewClaims(){
       <h1 class="h1">查證結果</h1>
       <p class="date">爆料和指控後來查出了什麼。最新查出結果的排在最上面。</p>
     </section>
+    ${fresh.length ? `<section class="today"><h2>今天有新進展<span class="badge-new">${fresh.length}</span></h2><div class="list">${groupByNews(fresh).map(g => `<article class="claim">
+      ${g.ev ? `<a class="gtitle" href="#e-${g.ev.date}-${g.ev.id}"><span>${fmtShort(g.ev.date)} 的新聞</span>${esc(g.ev.title)}</a>` : ''}
+      ${g.list.map(claimCard).join('')}</article>`).join('')}</div></section>` : ''}
     <section class="list">${groupByNews(resolved).map(g => `<article class="claim">
       ${g.ev ? `<a class="gtitle" href="#e-${g.ev.date}-${g.ev.id}"><span>${fmtShort(g.ev.date)} 的新聞</span>${esc(g.ev.title)}</a>` : '<p class="gtitle"><span>其他</span></p>'}
       ${g.list.map(claimCard).join('')}
