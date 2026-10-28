@@ -520,7 +520,7 @@ async function viewDay(date, isToday){
       <p class="date">${fmtDay(d.date)}${d.coverage ? ` · 涵蓋 ${esc(d.coverage)}` : ''}</p>
     </div>
     ${d.illustration ? `<div class="hero">${img(d.illustration, '', '今日插畫')}</div>` : ''}
-    ${progressN ? `<a class="progress" href="#claims">🔍 之前的新聞有 ${progressN} 則新進展 →</a>` : ''}
+    ${progressN ? `<a class="progress" href="#claims">🔍 之前的爆料有 ${progressN} 則查出結果 →</a>` : ''}
     <section class="list" aria-label="${esc(state.cat)}新聞">${shown.map(eventCard).join('') || '<p class="empty">這段時間沒有這類值得收的新聞。</p>'}</section>`;
 }
 
@@ -826,9 +826,9 @@ function claimCard(c){
     <details class="more"><summary>看證據</summary>${details}</details>
   </div>`;
 }
-/* 「今天有新進展」：只算以前就出現過的說法（第一次出現在今天的不算更新），並掛回最早那則新聞 */
+/* 「之前的爆料查出結果」：當天從待證據查出結論、且以前就出現過的說法，掛回最早那則新聞 */
 const firstEv = c => [...c.events].sort((a, b) => (a.date || '').localeCompare(b.date || ''))[0] || null;
-const isProgress = (c, day) => c.progressOn === day && firstEv(c) && firstEv(c).date < day;
+const isProgress = (c, day) => c.resolvedOn === day && RESOLVED.includes(markKey(c.status)) && firstEv(c) && firstEv(c).date < day;
 const miniClaim = c => `<li><b>${esc(c.claim)}</b><span>${esc(c.speaker || '')}${c.needs ? `・需要：${esc(c.needs)}` : ''}</span>${c.events[0] ? `<a href="#e-${c.events[0].date}-${c.events[0].id}">相關新聞 →</a>` : ''}</li>`;
 /* 依相關新聞分組（一條說法連到多則新聞時，歸到最近那則）；新聞依其中最新查出結果的時間排序 */
 function groupByNews(list){
@@ -845,7 +845,7 @@ function groupByNews(list){
 async function viewClaims(){
   const everything = (await getClaims()).claims;
   const latestDay = (await getIndex()).latest;
-  const fresh = everything.filter(c => latestDay && isProgress(c, latestDay));   // 今天有新進展：不管有沒有結論都放最上面
+  const fresh = everything.filter(c => latestDay && isProgress(c, latestDay));   // 今天查出結果的舊爆料放最上面
   const all = everything.filter(c => !fresh.includes(c));
   const by = k => all.filter(c => markKey(c.status) === k);
   const resolved = all.filter(c => RESOLVED.includes(markKey(c.status)))
@@ -860,8 +860,8 @@ async function viewClaims(){
       <h1 class="h1">查證結果</h1>
       <p class="date">爆料和指控後來查出了什麼。最新查出結果的排在最上面。</p>
     </section>
-    ${fresh.length ? `<section class="today"><h2>之前的新聞，有新進展<span class="badge-new">${fresh.length}</span></h2><div class="list">${fresh.map(c => { const ev = firstEv(c), later = c.events.filter(e => e.date === latestDay && e.id !== ev.id); return `<article class="claim">
-      <a class="gtitle" href="#e-${ev.date}-${ev.id}"><span>${fmtShort(ev.date)} 的新聞，後來有新進展</span>${esc(ev.title)}</a>
+    ${fresh.length ? `<section class="today"><h2>之前的爆料，今天查出結果<span class="badge-new">${fresh.length}</span></h2><div class="list">${fresh.map(c => { const ev = firstEv(c), later = c.events.filter(e => e.date === latestDay && e.id !== ev.id); return `<article class="claim">
+      <a class="gtitle" href="#e-${ev.date}-${ev.id}"><span>${fmtShort(ev.date)} 的新聞</span>${esc(ev.title)}</a>
       ${claimCard(c)}
       ${later.map(l => `<a class="still" href="#e-${l.date}-${l.id}">今天的後續新聞：${esc(l.title)} →</a>`).join('')}</article>`; }).join('')}</div></section>` : ''}
     <section class="list">${groupByNews(resolved).map(g => `<article class="claim">

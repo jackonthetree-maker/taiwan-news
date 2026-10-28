@@ -434,7 +434,7 @@ def build(api, save_images=True):
             "needs": prop(c, "需要什麼證據"),
             "burden": prop(c, "舉證責任"),
             "checkedOn": prop(c, "最後檢查日"),
-            "progressOn": prop(c, "最近進展日"),   # 有新證據或新進展的那天（網頁標「今天更新」）
+            "resolvedOn": prop(c, "查出結果日"),   # 從待證據查出結論的那天（網頁首頁提醒、查證頁置頂）
             "events": ev,
         })
     claims.sort(key=lambda c: (c["saidOn"] or "", c["checkedOn"] or ""), reverse=True)
