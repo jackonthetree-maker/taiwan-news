@@ -220,10 +220,20 @@ def source_index(rows):
     return idx
 
 
+def site(h):
+    """網站主網域：news.ltn.com.tw、ec.ltn.com.tw → ltn.com.tw（同一家媒體的不同子網站算同一家）"""
+    parts = h.split(".")
+    n = 3 if len(parts) >= 3 and parts[-2] in ("com", "org", "net", "gov", "edu") and len(parts[-1]) == 2 else 2
+    return ".".join(parts[-n:])
+
+
 def match_source(idx, url="", label=""):
     h = host(url) if url else ""
     for s in idx:
         if s["host"] and h and (h == s["host"] or h.endswith("." + s["host"])):
+            return s
+    for s in idx:   # 同一家媒體的其他子網站（例：自由財經 ec.ltn.com.tw）
+        if s["host"] and h and site(h) == site(s["host"]):
             return s
     for s in idx:
         if label and (label.startswith(s["name"]) or s["name"].startswith(label)):
