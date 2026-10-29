@@ -338,6 +338,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .party.p-w{background:#fff;color:#555;box-shadow:inset 0 0 0 1px #c8c8c8}
 .party.p-o{background:#eee;color:#555}
 @media (prefers-color-scheme: dark){.party.p-g{background:#1d3a25;color:#9fd8ae}.party.p-b{background:#1c2c45;color:#a9c6ef}.party.p-w{background:transparent;color:#ccc;box-shadow:inset 0 0 0 1px #666}.party.p-o{background:#333;color:#ccc}}
+.wait{display:block;font-style:normal;font-size:12.5px;font-weight:600;color:var(--mid);margin:2px 0}
 </style>
 </head>
 <body>
@@ -857,6 +858,7 @@ function claimCard(c){
     <div class="pills">${statusPill(c.status)}</div>
     <h3>${esc(c.claim)}</h3>
     <p class="who">${esc(c.speaker || '')}</p>
+    ${markKey(c.status) === '🔍' ? waitLine(c) : ''}
     ${c.result ? `<p class="result">${esc(c.result)}</p>` : ''}
     <details class="more"><summary>看證據</summary>${details}</details>
   </div>`;
@@ -864,7 +866,10 @@ function claimCard(c){
 /* 「之前的爆料查出結果」：當天從待證據查出結論、且以前就出現過的說法，掛回最早那則新聞 */
 const firstEv = c => [...c.events].sort((a, b) => (a.date || '').localeCompare(b.date || ''))[0] || null;
 const isProgress = (c, day) => c.resolvedOn === day && RESOLVED.includes(markKey(c.status)) && firstEv(c) && firstEv(c).date < day;
-const miniClaim = c => `<li><b>${esc(c.claim)}</b><span>${esc(c.speaker || '')}${c.needs ? `・需要：${esc(c.needs)}` : ''}</span>${c.events[0] ? `<a href="#e-${c.events[0].date}-${c.events[0].id}">相關新聞 →</a>` : ''}</li>`;
+/* 待證據經過幾天：用發言日期和今天（台北時間）相減，網頁自己算，不用額外資料 */
+const daysSince = d => { if (!d) return null; const t = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' })); t.setHours(0,0,0,0); const s = new Date(d + 'T00:00:00'); return Math.max(0, Math.round((t - s) / 86400000)); };
+const waitLine = c => { const n = daysSince(c.saidOn); if (n == null) return ''; return `<em class="wait">${n === 0 ? '今天提出' : `提出 ${n} 天`}，還沒拿出證據</em>`; };
+const miniClaim = c => `<li><b>${esc(c.claim)}</b>${markKey(c.status) === '🔍' ? waitLine(c) : ''}<span>${esc(c.speaker || '')}${c.needs ? `・需要：${esc(c.needs)}` : ''}</span>${c.events[0] ? `<a href="#e-${c.events[0].date}-${c.events[0].id}">相關新聞 →</a>` : ''}</li>`;
 /* 依相關新聞分組（一條說法連到多則新聞時，歸到最近那則）；新聞依其中最新查出結果的時間排序 */
 function groupByNews(list){
   const groups = new Map();
