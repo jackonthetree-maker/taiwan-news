@@ -612,15 +612,17 @@ const PARTY_CHIP = [[/^民進黨/, '民進黨', 'p-g'], [/^國民黨/, '國民�
   [/^(時代力量|台灣基進|親民黨|新黨|台灣民眾黨)/, null, 'p-o'], [/^無黨籍/, '無黨籍', 'p-o']];
 function partyOf(role){
   const r = String(role || '');
-  if (/中國國務院|中共|中國政府|中華人民共和國/.test(r)) return { role: r, chip: ['中國官方', 'p-o'] };
+  if (/中國國務院|中共|中國政府|中華人民共和國|國台辦/.test(r)) return { role: r, chip: ['中國官方', 'p-o'] };
   const parts = r.split(/[，,]/).map(s => s.trim());
   const last = parts.length > 1 ? parts[parts.length - 1] : '';
   for (const [re, label, cls] of PARTY_CHIP) {
     if (last && re.test(last)) return { role: parts.slice(0, -1).join('，'), chip: [last.replace(/執政$/, '') === last ? (label || last.match(re)[0]) : last, cls] };
   }
-  for (const [re, label, cls] of PARTY_CHIP) {
-    const m = r.match(re);
-    if (m && re.source !== '^無黨籍') return { role: r, chip: [label || m[0], cls] };
+  for (const seg of r.split(/[、，,]/).map(s => s.trim())) {   // 「總統、民進黨主席」「台北市長、國民黨台北市長參選人」
+    for (const [re, label, cls] of PARTY_CHIP) {
+      const m = seg.match(re);
+      if (m && re.source !== '^無黨籍') return { role: r, chip: [label || m[0], cls] };
+    }
   }
   return { role: r, chip: null };
 }
