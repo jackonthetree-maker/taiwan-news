@@ -481,11 +481,13 @@ const natureRank = e => { const i = natureType(e.primaryNature); return i < 0 ? 
 const checkRank = e => { const k = markKey(e.check); return k in CHECK_RANK ? CHECK_RANK[k] : 4; };
 const byPriority = (a, b) => natureRank(a) - natureRank(b) || checkRank(a) - checkRank(b) || (a.order ?? 99) - (b.order ?? 99);
 
+/* 國際、財經新聞沒有藍綠媒體時，不顯示立場點（外電、財經媒體沒有藍綠之分，三個 0 反而像沒比對） */
+const showLean = e => { const cv = coverage(e); return !(['國際','財經'].includes(e.category) && !cv.green.length && !cv.blue.length); };
 function eventCard(e){
   const tags = [];
   if (e.mediaCount != null) tags.push(`<span>比對 ${e.mediaCount} 家媒體</span>`);
   const cv = coverage(e);
-  tags.push(`<span class="covmini" aria-label="偏綠 ${cv.green.length} 家、中立 ${cv.neutral.length} 家、偏藍 ${cv.blue.length} 家">${
+  if (showLean(e)) tags.push(`<span class="covmini" aria-label="偏綠 ${cv.green.length} 家、中立 ${cv.neutral.length} 家、偏藍 ${cv.blue.length} 家">${
     [['green','g','綠'],['neutral','n','中'],['blue','b','藍']].map(([k, c, l]) => `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('')}</span>`);
   return `<a class="card" href="#e-${e.date}-${e.id}">
     <div class="pills">${naturePill(e)}</div>
@@ -684,7 +686,7 @@ function covLineHTML(e, date){
   const dots = [['green','g','偏綠'],['neutral','n','中立'],['blue','b','偏藍']].map(([k, c, l]) =>
     `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('');
   const gap = e.gap && !/^無/.test(e.gap.trim()) ? `<p class="gapline">要注意：${esc(e.gap)}</p>` : '';
-  return `<div class="covline"><span>${date ? date + ' · ' : ''}${total} 家媒體報導</span><span class="covmini">${dots}</span></div>${gap}`;
+  return `<div class="covline"><span>${date ? date + ' · ' : ''}${total} 家媒體報導</span>${showLean(e) ? `<span class="covmini">${dots}</span>` : ''}</div>${gap}`;
 }
 
 /* 媒體怎麼寫：依立場分組，跟「人物怎麼說」同一種卡片；跨媒體的提醒另外列在「要注意」 */
