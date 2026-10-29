@@ -332,6 +332,12 @@ figcaption{font-size:12px;color:var(--muted)}
 .crow h3{font-size:15.5px;line-height:1.55}
 .speaker h3 .role{font-size:13px;font-weight:500;color:var(--muted)}
 .claim .still{font-size:13.5px;color:var(--fg2);border-top:1px solid var(--line);padding-top:10px;min-height:44px;display:flex;align-items:center;text-decoration:none}
+.party{display:inline-block;font-size:11.5px;font-weight:700;line-height:1;padding:3px 7px;border-radius:999px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.party.p-g{background:#e3f1e6;color:#1f6b35}
+.party.p-b{background:#e2ebf7;color:#1f4f8f}
+.party.p-w{background:#fff;color:#555;box-shadow:inset 0 0 0 1px #c8c8c8}
+.party.p-o{background:#eee;color:#555}
+@media (prefers-color-scheme: dark){.party.p-g{background:#1d3a25;color:#9fd8ae}.party.p-b{background:#1c2c45;color:#a9c6ef}.party.p-w{background:transparent;color:#ccc;box-shadow:inset 0 0 0 1px #666}.party.p-o{background:#333;color:#ccc}}
 </style>
 </head>
 <body>
@@ -601,6 +607,23 @@ function parseSpeaker(label){
   if (!m) return { name: String(label || '').trim(), role: '', via: '' };
   return CHANNEL_RE.test(m[2]) ? { name: m[1].trim(), role: '', via: m[2] } : { name: m[1].trim(), role: m[2], via: '' };
 }
+/* 發言者黨籍：職位括號最後一段寫黨籍（「外交部長，民進黨」「行政院，民進黨執政」），或職位以黨名開頭（「民進黨前立委」）；中國官方另外標 */
+const PARTY_CHIP = [[/^民進黨/, '民進黨', 'p-g'], [/^國民黨/, '國民黨', 'p-b'], [/^民眾黨/, '民眾黨', 'p-w'],
+  [/^(時代力量|台灣基進|親民黨|新黨|台灣民眾黨)/, null, 'p-o'], [/^無黨籍/, '無黨籍', 'p-o']];
+function partyOf(role){
+  const r = String(role || '');
+  if (/中國國務院|中共|中國政府|中華人民共和國/.test(r)) return { role: r, chip: ['中國官方', 'p-o'] };
+  const parts = r.split(/[，,]/).map(s => s.trim());
+  const last = parts.length > 1 ? parts[parts.length - 1] : '';
+  for (const [re, label, cls] of PARTY_CHIP) {
+    if (last && re.test(last)) return { role: parts.slice(0, -1).join('，'), chip: [last.replace(/執政$/, '') === last ? (label || last.match(re)[0]) : last, cls] };
+  }
+  for (const [re, label, cls] of PARTY_CHIP) {
+    const m = r.match(re);
+    if (m && re.source !== '^無黨籍') return { role: r, chip: [label || m[0], cls] };
+  }
+  return { role: r, chip: null };
+}
 function speakersHTML(nodes){
   const groups = [], byName = {};
   const add = (label, html) => {
@@ -624,7 +647,7 @@ function speakersHTML(nodes){
       add(sp[1], sayHTML([...lead, ...body]));
     } else add('', sayHTML(rs));
   }
-  return `<div class="speakers">${groups.map(g => `<div class="speaker">${g ? `<h3>${esc(g)}${byName[g].role ? `<span class="role">${esc(byName[g].role)}</span>` : ''}</h3>` : ''}${byName[g].items.join('')}</div>`).join('')}</div>`;
+  return `<div class="speakers">${groups.map(g => `<div class="speaker">${g ? (() => { const p = partyOf(byName[g].role); return `<h3>${esc(g)}${p.chip ? `<span class="party ${p.chip[1]}">${esc(p.chip[0])}</span>` : ''}${p.role ? `<span class="role">${esc(p.role)}</span>` : ''}</h3>`; })() : ''}${byName[g].items.join('')}</div>`).join('')}</div>`;
 }
 
 /* 各家報導的差異：每一點一張卡；「偏綠的…／偏藍的…／中央社…」變成有顏色標籤的列 */
