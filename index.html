@@ -541,7 +541,7 @@ function coverageHTML(e){
   const bar = keys.map(([k, c]) => `<span class="${cv[k].length ? c : 'z'}" style="flex:${Math.max(cv[k].length, 1)}"></span>`).join('');
   const rows = keys.map(([k, c, l]) => `<span class="pill ${LEAN[k][1]}">${l}</span><b>${cv[k].length} 家</b>${
     cv[k].length ? `<span class="names">${cv[k].map(esc).join('、')}</span>` : '<span class="none">沒找到報導</span>'}`).join('');
-  const note = e.gap && !/^無/.test(e.gap.trim()) ? `<p class="cov-note"><b>要注意：</b>${esc(e.gap)}</p>` : '';
+  const note = gapNote(e.gap) ? `<p class="cov-note"><b>要注意：</b>${esc(gapNote(e.gap))}</p>` : '';
   return `<section class="cov" aria-label="哪些媒體有報導"><h2>哪些媒體有報導</h2><div class="cov-bar" aria-hidden="true">${bar}</div><div class="cov-rows">${rows}</div>${note}</section>`;
 }
 
