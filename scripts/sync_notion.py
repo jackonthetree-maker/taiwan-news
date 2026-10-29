@@ -134,8 +134,8 @@ def urls_in(text):
     return URL_RE.findall(text or "")
 
 
-# 舊類別 → 新的 4 類（Notion 選項改完後舊資料也照新分類顯示）
-CATEGORY_ALIAS = {"社會": "社會・生活", "經濟": "財經・科技", "科技產業": "財經・科技"}
+# 舊類別名稱 → 現在的 4 類：政治、社會、國際、財經
+CATEGORY_ALIAS = {"社會・生活": "社會", "財經・科技": "財經", "經濟": "財經", "科技產業": "財經"}
 
 
 def lines(text):

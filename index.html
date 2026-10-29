@@ -502,7 +502,7 @@ async function viewDay(date, isToday){
   if (!date) date = idx.latest;
   if (!date) return '<p class="empty">還沒有新聞資料。</p>';
   const d = await getDay(date);
-  const CAT_ORDER = ['政治','社會・生活','國際','財經・科技'];
+  const CAT_ORDER = ['政治','社會','國際','財經'];
   const present = [...new Set(d.events.map(e => e.category).filter(Boolean))];
   const cats = [...CAT_ORDER, ...present.filter(c => !CAT_ORDER.includes(c))];  // 4 類固定顯示，當天沒有的顯示 0
   if (!cats.includes(state.cat)) state.cat = cats[0];
