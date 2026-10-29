@@ -681,11 +681,19 @@ function sourcesHTML(e){
 }
 
 /* 一行：幾家媒體報導、各立場幾家 */
+/* 立場缺口：「無」或「無（偏綠：…）」不顯示；「無（…）。但官方沒回應」只顯示「但」後面的提醒 */
+function gapNote(g){
+  let t = String(g || '').trim();
+  if (!t.startsWith('無')) return t;
+  t = t.replace(/^無\s*([（(][^）)]*[）)])?\s*[。．.，,；;、]?\s*/, '').replace(/^(但是|不過|但)\s*[，,]?\s*/, '');
+  return t;
+}
 function covLineHTML(e, date){
   const cv = coverage(e), total = e.mediaCount != null ? e.mediaCount : cv.green.length + cv.neutral.length + cv.blue.length + cv.other.length;
   const dots = [['green','g','偏綠'],['neutral','n','中立'],['blue','b','偏藍']].map(([k, c, l]) =>
     `<span class="${cv[k].length ? '' : 'zero'}"><i class="${c}"></i>${l} ${cv[k].length}</span>`).join('');
-  const gap = e.gap && !/^無/.test(e.gap.trim()) ? `<p class="gapline">要注意：${esc(e.gap)}</p>` : '';
+  const gapText = gapNote(e.gap);
+  const gap = gapText ? `<p class="gapline">要注意：${esc(gapText)}</p>` : '';
   return `<div class="covline"><span>${date ? date + ' · ' : ''}${total} 家媒體報導</span>${showLean(e) ? `<span class="covmini">${dots}</span>` : ''}</div>${gap}`;
 }
 
