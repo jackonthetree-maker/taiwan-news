@@ -361,6 +361,9 @@ figcaption{font-size:12px;color:var(--muted)}
 .chk-res .pill{flex:0 0 auto}
 @media (prefers-color-scheme: dark){.s-guess{background:#2E2442;color:#CDB8F5}.s-guess-hi{background:#3A2C57;color:#DCCBFA}.s-guess-lo{background:#262033;color:#B5A6D6}.sec.ctx{border-color:#5E4B8A}}
 .g-known{margin:0 0 12px}.g-known h3{font-size:13px;color:var(--muted);margin:0 0 4px}.g-known ul{margin:0;padding-left:18px;font-size:14.5px;line-height:1.65}
+.tl-more summary{cursor:pointer;font-size:13px;color:var(--muted);margin:4px 0 8px}
+.tl a{text-decoration:none;color:inherit}
+.ctx-fold{border:1.5px dashed #B9A6E0}
 </style>
 </head>
 <body>
@@ -819,15 +822,24 @@ function sourcesGroupedHTML(e){
 
 /* 前情時間線：「10/27｜發生什麼」一行一件；不是這個格式的照原樣顯示 */
 const TL_RE = /^\s*((?:\d{4}\/)?\d{1,2}\/\d{1,2})\s*[｜|]\s*/;
-function timelineHTML(nodes){
+function timelineHTML(nodes, prior){
   let html = '', items = [];
+  const linkFor = md => (prior || []).find(p => fmtShort(p.date) === md.replace(/^\d{4}\//, ''));
   const flush = () => { if (items.length) { html += `<ol class="tl">${items.join('')}</ol>`; items = []; } };
   for (const n of nodes) {
     const rs = n.r || [], m = runsText(rs).match(TL_RE);
-    if (m) items.push(`<li><span class="tl-d">${esc(m[1])}</span><div>${runsHTML(cutRuns(rs, m[0].length))}${n.c ? nodesHTML(n.c) : ''}</div></li>`);
+    if (m) { const pe = linkFor(m[1]); const inner = runsHTML(cutRuns(rs, m[0].length));
+      items.push(`<li><span class="tl-d">${esc(m[1])}</span><div>${pe ? `<a href="#e-${pe.date}-${pe.id}">${inner} →</a>` : inner}</div></li>`); }
     else { flush(); html += nodesHTML([n]); }
   }
   flush(); return html;
+}
+/* 時間線太長只露最近 3 件，較早的收起來 */
+function timelineShort(nodes, prior){
+  const tl = nodes.filter(n => TL_RE.test(runsText(n.r || [])));
+  if (tl.length <= 3) return timelineHTML(nodes, prior);
+  const other = nodes.filter(n => !tl.includes(n));
+  return `<details class="tl-more"><summary>更早 ${tl.length - 3} 件</summary>${timelineHTML(tl.slice(0, -3), prior)}</details>` + timelineHTML(tl.slice(-3), prior) + (other.length ? nodesHTML(other) : '');
 }
 /* 查證說明：「說法或數字 → ✅ 補充」一行一塊，結果標記放右邊 */
 const ARROW_MARK_RE = /\s*(→|->)\s*(✅|🔍|💬|⚖️?|⏳|⚠️?|✂️?|❌|🕐|🧩)\s*/;
@@ -888,15 +900,14 @@ async function viewEvent(date, id){
   const prior = get('前情');
   if (prior || e.prior.length || e.issues.length) body += sec('前情', `
     ${e.issues.map(i => `<span class="series">系列：${esc(i.name)}</span>`).join('')}
-    ${prior ? `<div class="rich">${timelineHTML(prior.body)}</div>` : ''}
-    ${e.prior.length ? `<div class="prior">${e.prior.map(p => `<a href="#e-${p.date}-${p.id}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}`, 'bg');
+    ${prior ? `<div class="rich">${timelineShort(prior.body, e.prior)}</div>` : ''}
+    ${e.prior.length && !(prior && prior.body.some(n => TL_RE.test(runsText(n.r || [])))) ? `<div class="prior">${e.prior.map(p => `<a href="#e-${p.date}-${p.id}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}`, 'bg');
   const facts = get('已確認的事實');
   if (facts && facts.body.length) body += sec(facts.title, factsHTML(facts.body, e));
   body += whoSaysHTML(e, get('各方說法'), get('各家報導的差異'));
   const known = ['一句話看懂','跟你有什麼關係','看完你可以怎麼想','前情','已確認的事實','各方說法','各家報導的差異','查證說明','背後脈絡','來源'];
   for (const s of secs) if (!known.some(o => s.title.startsWith(o)) && s.body.length) body += sec(s.title, `<div class="rich">${nodesHTML(s.body)}</div>`);
   const ctx = get('背後脈絡');
-  if (ctx && ctx.body.length) body += sec('背後脈絡', contextHTML(ctx.body), 'ctx');
   if (!secs.length) body += '<p class="note">完整內文整理中。</p>';
 
   /* 第三層：想深入再點開 */
@@ -905,7 +916,8 @@ async function viewEvent(date, id){
     ${chk ? `<ul class="checks">${chk.body.map(checkItemHTML).join('')}</ul>` : ''}
     ${claims.length ? `<a class="morelink" href="#claims">這則有 ${claims.length} 條說法在「查證」頁持續追蹤 →</a>` : ''}</div></details>` : '';
   const src = sourcesGroupedHTML(e);
-  if (chkFold || src) body += `<section class="deeper"><p>想深入再點開</p>${chkFold}${src}</section>`;
+  const ctxFold = ctx && ctx.body.length ? `<details class="fold ctx-fold"><summary><span>🧩 背後脈絡<small>推測，非事實</small></span></summary><div class="inner">${contextHTML(ctx.body)}</div></details>` : '';
+  if (chkFold || src || ctxFold) body += `<section class="deeper"><p>想深入再點開</p>${ctxFold}${chkFold}${src}</section>`;
 
   const p = e.photo || {};
   return `<div class="ev">
