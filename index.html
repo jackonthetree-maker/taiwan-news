@@ -339,6 +339,27 @@ figcaption{font-size:12px;color:var(--muted)}
 .party.p-o{background:#eee;color:#555}
 @media (prefers-color-scheme: dark){.party.p-g{background:#1d3a25;color:#9fd8ae}.party.p-b{background:#1c2c45;color:#a9c6ef}.party.p-w{background:transparent;color:#ccc;box-shadow:inset 0 0 0 1px #666}.party.p-o{background:#333;color:#ccc}}
 .wait{display:block;font-style:normal;font-size:12.5px;font-weight:600;color:var(--mid);margin:2px 0}
+.s-guess{background:#EFE8FB;color:#5B3A99} .s-guess-hi{background:#E4D8F8;color:#4A2A8A} .s-guess-lo{background:#F4F0FB;color:#7A64A8}
+.sec.ctx{border:1.5px dashed #B9A6E0;border-radius:16px;padding:16px;background:transparent}
+.g-note{font-size:13px;color:var(--muted);margin:0 0 10px}
+.guess{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px dashed var(--line)}
+.guess:first-of-type{border-top:0;padding-top:0}
+.guess .pill{align-self:flex-start;font-size:12px;font-weight:700}
+.g-head{margin:0;font-size:15.5px;line-height:1.7;font-weight:600}
+.g-row{display:grid;grid-template-columns:1fr;gap:2px;font-size:14.5px;line-height:1.65}
+.g-row b{font-size:12.5px;color:var(--muted)}
+.g-row.plain{color:var(--fg2)}
+.tl{list-style:none;margin:6px 0 0;padding:0;position:relative}
+.tl li{display:grid;grid-template-columns:48px minmax(0,1fr);gap:10px;padding:0 0 12px;position:relative;font-size:15px;line-height:1.65}
+.tl li::before{content:"";position:absolute;left:52px;top:9px;width:7px;height:7px;border-radius:50%;background:var(--fg)}
+.tl li::after{content:"";position:absolute;left:55px;top:18px;bottom:-2px;width:1px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl li > div{padding-left:14px}
+.tl-d{font-size:13px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:1px}
+.checks .chk-row{flex-direction:column;gap:6px;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.chk-res{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--fg2)}
+.chk-res .pill{flex:0 0 auto}
+@media (prefers-color-scheme: dark){.s-guess{background:#2E2442;color:#CDB8F5}.s-guess-hi{background:#3A2C57;color:#DCCBFA}.s-guess-lo{background:#262033;color:#B5A6D6}.sec.ctx{border-color:#5E4B8A}}
 </style>
 </head>
 <body>
@@ -382,11 +403,12 @@ const LABELS = {
   '💬':['💬','觀點','s-view','解讀、評價或預測，本來就沒有真假'],
   '⚠':['⚠️','誤導','s-cut','沒有造假，但標題或數字的寫法容易讓人誤會'],
   '✂':['✂️','斷章取義','s-cut','原話是真的，但剪掉前後文，意思被改變'],
-  '🕐':['🕐','久未舉證','s-wait','超過 30 天沒人拿出證據（不代表是假的）']
+  '🕐':['🕐','久未舉證','s-wait','超過 30 天沒人拿出證據（不代表是假的）'],
+  '🧩':['🧩','推測','s-guess','根據已知事實推論的可能解釋，不是事實；會寫可能性高低、其他解釋，以及什麼證據會推翻它']
 };
 const EVENT_MARKS = ['✅','⚖','⏳','❌'];
 const CLAIM_MARKS = ['✅','🔍','💬','⚠','✂','❌','🕐'];
-const MARK_RE = /^\s*(✅|🔍|💬|⚖️?|⏳|⚠️?|✂️?|❌|🕐)\s*/;
+const MARK_RE = /^\s*(✅|🔍|💬|⚖️?|⏳|⚠️?|✂️?|❌|🕐|🧩)\s*/;
 const markKey = s => { const m = (s || '').match(MARK_RE); return m ? m[1].replace(/️/g, '') : null; };
 const EVENT_LABEL = { '✅':['✅','經過已證實','s-ok','事件本身（誰、何時、做了什麼）已有一手資料或多家各自採訪的報導證實；事件裡個別的說法另外標示'] };
 const pendingCount = e => {
@@ -431,7 +453,7 @@ function withMark(rs){
   const first = rs && rs[0] ? rs[0].x : '';
   const m = first.match(MARK_RE);
   if (!m) return runsHTML(rs);
-  const after = first.slice(m[0].length).replace(/^(已證實|事實|屬實|各說各話|報導有誤|有誤|不實|待確認|待證據|觀點|誤導|部分正確|斷章取義|久未舉證)\s*[：:]\s*/, '');
+  const after = first.slice(m[0].length).replace(/^(已證實|事實|屬實|各說各話|報導有誤|有誤|不實|待確認|待證據|觀點|誤導|部分正確|斷章取義|久未舉證|推測)\s*[：:]\s*/, '');
   const rest = [{ ...rs[0], x: after }, ...rs.slice(1)];
   return `${statusPill(m[1])} ` + runsHTML(rest);
 }
@@ -554,11 +576,12 @@ function coverageHTML(e){
 
 /* 文字片段工具 */
 const runsText = rs => (rs || []).map(r => r.x).join('');
-function cutRuns(rs, n){                  // 去掉開頭 n 個字
-  const out = []; let left = n;
+function cutRuns(rs, n, end){             // 取第 n 個字到第 end 個字（end 省略＝到最後）
+  const out = []; let pos = 0;
   for (const r of rs || []) {
-    if (left >= r.x.length) { left -= r.x.length; continue; }
-    out.push({ ...r, x: r.x.slice(left) }); left = 0;
+    const s = pos, e = pos + r.x.length; pos = e;
+    const from = Math.max(n, s), to = Math.min(end == null ? e : end, e);
+    if (to > from) out.push({ ...r, x: r.x.slice(from - s, to - s) });
   }
   return out;
 }
@@ -793,6 +816,55 @@ function sourcesGroupedHTML(e){
     <p class="srcnote">偏綠、偏藍、中立依一般認知標示，說明見「說明」頁。</p></div></details>`;
 }
 
+/* 前情時間線：「10/27｜發生什麼」一行一件；不是這個格式的照原樣顯示 */
+const TL_RE = /^\s*(\d{1,2}\/\d{1,2})\s*[｜|]\s*/;
+function timelineHTML(nodes){
+  let html = '', items = [];
+  const flush = () => { if (items.length) { html += `<ol class="tl">${items.join('')}</ol>`; items = []; } };
+  for (const n of nodes) {
+    const rs = n.r || [], m = runsText(rs).match(TL_RE);
+    if (m) items.push(`<li><span class="tl-d">${esc(m[1])}</span><div>${runsHTML(cutRuns(rs, m[0].length))}${n.c ? nodesHTML(n.c) : ''}</div></li>`);
+    else { flush(); html += nodesHTML([n]); }
+  }
+  flush(); return html;
+}
+/* 查證說明：「說法或數字 → ✅ 補充」一行一塊，結果標記放右邊 */
+const ARROW_MARK_RE = /\s*(→|->)\s*(✅|🔍|💬|⚖️?|⏳|⚠️?|✂️?|❌|🕐|🧩)\s*/;
+function checkItemHTML(n){
+  const rs = n.r || [], txt = runsText(rs), m = txt.match(ARROW_MARK_RE);
+  if (m && !MARK_RE.test(txt)) {
+    const before = cutRuns(rs, 0, m.index), after = cutRuns(rs, m.index + m[0].length);
+    return `<li class="chk-row"><div class="chk-claim">${runsHTML(before)}</div><div class="chk-res">${statusPill(m[2])}${runsText(after).trim() ? `<span>${runsHTML(after)}</span>` : ''}</div>${n.c ? nodesHTML(n.c) : ''}</li>`;
+  }
+  return `<li>${withMark(rs)}${n.c ? nodesHTML(n.c) : ''}</li>`;
+}
+/* 背後脈絡：推測，跟事實分開顯示 */
+const GUESS_LV = { '高':'s-guess-hi', '中':'s-guess', '低':'s-guess-lo' };
+function contextHTML(nodes){
+  const cards = []; let cur = null;
+  const push = () => { if (cur) cards.push(cur); cur = null; };
+  const rowOf = (label, rs) => `<div class="g-row"><b>${esc(label)}</b><div>${runsHTML(rs)}</div></div>`;
+  const walk = list => { for (const n of list) {
+    const rs = n.r || [], txt = runsText(rs);
+    const g = txt.match(/^\s*🧩\s*(推測\s*[：:]\s*)?/);
+    if (g) {
+      push();
+      const lv = txt.match(/[（(]\s*可能性\s*[：:]\s*([高中低])\s*[）)]\s*$/);
+      const body = cutRuns(rs, g[0].length, lv ? lv.index : undefined);
+      cur = { head: `<p class="g-head">${runsHTML(body)}</p>`, lv: lv ? lv[1] : '', rows: [] };
+    } else {
+      const lb = txt.match(/^\s*(其他可能的解釋|其他解釋|什麼證據會推翻它|什麼證據可以推翻|推翻條件)\s*[：:]\s*/);
+      if (lb && cur) cur.rows.push(rowOf(lb[1].startsWith('其他') ? '其他可能的解釋' : '什麼證據會推翻它', cutRuns(rs, lb[0].length)));
+      else if (cur) cur.rows.push(`<div class="g-row plain">${runsHTML(rs)}</div>`);
+      else cards.push({ head: `<p>${runsHTML(rs)}</p>`, lv: '', rows: [] });
+    }
+    if (n.c) walk(n.c);
+  } };
+  walk(nodes); push();
+  return `<p class="g-note">🧩 推測，非事實：以下是根據已知事實推出的可能解釋，還沒有證據證實。</p>` +
+    cards.map(c => `<div class="guess">${c.lv ? `<span class="pill ${GUESS_LV[c.lv]}">可能性：${esc(c.lv)}</span>` : ''}${c.head}${c.rows.join('')}</div>`).join('');
+}
+
 async function viewEvent(date, id){
   const d = await getDay(date);
   const e = d.events.find(x => x.id === id);
@@ -815,19 +887,21 @@ async function viewEvent(date, id){
   const prior = get('前情');
   if (prior || e.prior.length || e.issues.length) body += sec('前情', `
     ${e.issues.map(i => `<span class="series">系列：${esc(i.name)}</span>`).join('')}
-    ${prior ? `<div class="rich">${nodesHTML(prior.body)}</div>` : ''}
+    ${prior ? `<div class="rich">${timelineHTML(prior.body)}</div>` : ''}
     ${e.prior.length ? `<div class="prior">${e.prior.map(p => `<a href="#e-${p.date}-${p.id}"><span>${fmtShort(p.date)}</span><span>${esc(p.title)}</span></a>`).join('')}</div>` : ''}`, 'bg');
   const facts = get('已確認的事實');
   if (facts && facts.body.length) body += sec(facts.title, factsHTML(facts.body, e));
   body += whoSaysHTML(e, get('各方說法'), get('各家報導的差異'));
-  const known = ['一句話看懂','跟你有什麼關係','看完你可以怎麼想','前情','已確認的事實','各方說法','各家報導的差異','查證說明','來源'];
+  const known = ['一句話看懂','跟你有什麼關係','看完你可以怎麼想','前情','已確認的事實','各方說法','各家報導的差異','查證說明','背後脈絡','來源'];
   for (const s of secs) if (!known.some(o => s.title.startsWith(o)) && s.body.length) body += sec(s.title, `<div class="rich">${nodesHTML(s.body)}</div>`);
+  const ctx = get('背後脈絡');
+  if (ctx && ctx.body.length) body += sec('背後脈絡', contextHTML(ctx.body), 'ctx');
   if (!secs.length) body += '<p class="note">完整內文整理中。</p>';
 
   /* 第三層：想深入再點開 */
   const chk = get('查證說明');
   const chkFold = (chk && chk.body.length) || claims.length ? `<details class="fold"><summary><span>怎麼查證的</span></summary><div class="inner">
-    ${chk ? `<ul class="checks">${chk.body.map(n => `<li>${withMark(n.r)}${n.c ? nodesHTML(n.c) : ''}</li>`).join('')}</ul>` : ''}
+    ${chk ? `<ul class="checks">${chk.body.map(checkItemHTML).join('')}</ul>` : ''}
     ${claims.length ? `<a class="morelink" href="#claims">這則有 ${claims.length} 條說法在「查證」頁持續追蹤 →</a>` : ''}</div></details>` : '';
   const src = sourcesGroupedHTML(e);
   if (chkFold || src) body += `<section class="deeper"><p>想深入再點開</p>${chkFold}${src}</section>`;
@@ -937,7 +1011,7 @@ async function viewPrinciples(){
       row('<span class="pill l-green">偏綠</span>', '一般認為立場較接近民進黨'),
       row('<span class="pill l-neutral">中立</span>', '通訊社、公共媒體等，作為比對基準'),
       row('<span class="pill l-blue">偏藍</span>', '一般認為立場較接近國民黨')]))}
-    ${sec('標記說明', dl(['✅','🔍','💬','⚖','⏳','⚠','✂','❌','🕐'].map(k => { const [e, l, c, d] = LABELS[k]; return row(`<span class="pill ${c}">${e} ${l}</span>`, d); }))
+    ${sec('標記說明', dl(['✅','🔍','💬','⚖','⏳','⚠','✂','❌','🕐','🧩'].map(k => { const [e, l, c, d] = LABELS[k]; return row(`<span class="pill ${c}">${e} ${l}</span>`, d); }))
       + '<p class="date">文章最上面的「✅ 經過已證實」，指事件經過（誰、何時、做了什麼）已證實。</p>')}
     ${sec('我們怎麼做', `<div class="rich"><ul>
       <li>政治新聞至少比對偏綠、偏藍、中立各一家媒體。</li>
