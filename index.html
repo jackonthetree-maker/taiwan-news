@@ -360,6 +360,7 @@ figcaption{font-size:12px;color:var(--muted)}
 .chk-res{display:flex;gap:8px;align-items:flex-start;font-size:14px;color:var(--fg2)}
 .chk-res .pill{flex:0 0 auto}
 @media (prefers-color-scheme: dark){.s-guess{background:#2E2442;color:#CDB8F5}.s-guess-hi{background:#3A2C57;color:#DCCBFA}.s-guess-lo{background:#262033;color:#B5A6D6}.sec.ctx{border-color:#5E4B8A}}
+.g-known{margin:0 0 12px}.g-known h3{font-size:13px;color:var(--muted);margin:0 0 4px}.g-known ul{margin:0;padding-left:18px;font-size:14.5px;line-height:1.65}
 </style>
 </head>
 <body>
@@ -817,7 +818,7 @@ function sourcesGroupedHTML(e){
 }
 
 /* 前情時間線：「10/27｜發生什麼」一行一件；不是這個格式的照原樣顯示 */
-const TL_RE = /^\s*(\d{1,2}\/\d{1,2})\s*[｜|]\s*/;
+const TL_RE = /^\s*((?:\d{4}\/)?\d{1,2}\/\d{1,2})\s*[｜|]\s*/;
 function timelineHTML(nodes){
   let html = '', items = [];
   const flush = () => { if (items.length) { html += `<ol class="tl">${items.join('')}</ol>`; items = []; } };
@@ -841,7 +842,7 @@ function checkItemHTML(n){
 /* 背後脈絡：推測，跟事實分開顯示 */
 const GUESS_LV = { '高':'s-guess-hi', '中':'s-guess', '低':'s-guess-lo' };
 function contextHTML(nodes){
-  const cards = []; let cur = null;
+  const cards = [], known = []; let cur = null;
   const push = () => { if (cur) cards.push(cur); cur = null; };
   const rowOf = (label, rs) => `<div class="g-row"><b>${esc(label)}</b><div>${runsHTML(rs)}</div></div>`;
   const walk = list => { for (const n of list) {
@@ -856,12 +857,12 @@ function contextHTML(nodes){
       const lb = txt.match(/^\s*(其他可能的解釋|其他解釋|什麼證據會推翻它|什麼證據可以推翻|推翻條件)\s*[：:]\s*/);
       if (lb && cur) cur.rows.push(rowOf(lb[1].startsWith('其他') ? '其他可能的解釋' : '什麼證據會推翻它', cutRuns(rs, lb[0].length)));
       else if (cur) cur.rows.push(`<div class="g-row plain">${runsHTML(rs)}</div>`);
-      else cards.push({ head: `<p>${runsHTML(rs)}</p>`, lv: '', rows: [] });
+      else { const k = cutRuns(rs, (txt.match(/^\s*已知的事\s*[：:]?\s*/) || [''])[0].length); if (runsText(k).trim()) known.push(`<li>${runsHTML(k)}</li>`); }
     }
     if (n.c) walk(n.c);
   } };
   walk(nodes); push();
-  return `<p class="g-note">🧩 推測，非事實：以下是根據已知事實推出的可能解釋，還沒有證據證實。</p>` +
+  return (known.length ? `<div class="g-known"><h3>已知的事</h3><ul>${known.join('')}</ul></div>` : '') + `<p class="g-note">🧩 推測，非事實：以下是根據已知事實推出的可能解釋，還沒有證據證實。</p>` +
     cards.map(c => `<div class="guess">${c.lv ? `<span class="pill ${GUESS_LV[c.lv]}">可能性：${esc(c.lv)}</span>` : ''}${c.head}${c.rows.join('')}</div>`).join('');
 }
 
