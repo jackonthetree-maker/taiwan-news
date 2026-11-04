@@ -40,5 +40,5 @@ jobs:
             echo "沒有新資料。"
           else
             git commit -m "每日同步 $(TZ=Asia/Taipei date +%F)"
-            git push
+            git pull --rebase && git push
           fi
