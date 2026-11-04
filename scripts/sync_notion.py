@@ -185,7 +185,7 @@ def convert(blocks):
         if kids:
             node["c"] = kids
         if node["r"] or kids:
-            out.extend(split_lines(node))
+            out.append(node)
     return out
 
 
@@ -222,15 +222,27 @@ def sections(blocks):
             secs.append(cur)
         elif cur is not None:
             cur["blocks"].append(b)
+    return tidy([{"title": s["title"], "body": convert(s["blocks"])} for s in secs])
+
+
+def tidy_nodes(nodes):
     out = []
+    for n in nodes:
+        if n.get("c"):
+            n["c"] = tidy_nodes(n["c"])
+        out.extend(split_lines(n))
+    return out
+
+
+def tidy(secs):
+    """多行拆開；事實／說法／查證一律當條列（舊快取也適用）"""
     for s in secs:
-        body = convert(s["blocks"])
+        s["body"] = tidy_nodes(s["body"])
         if s["title"] in LIST_SECTIONS:
-            for n in body:
+            for n in s["body"]:
                 if n["t"] == "p":
                     n["t"] = "li"
-        out.append({"title": s["title"], "body": body})
-    return out
+    return secs
 
 
 def text_of(node):
@@ -404,7 +416,7 @@ def build(api, save_images=True):
         edited = p.get("last_edited_time")
         old = cache.get(k)
         if old and old.get("edited") == edited:
-            secs = old["sections"]
+            secs = tidy(old["sections"])
         else:
             secs = sections(api.children(p["id"]))
         prop_urls = urls_in(prop(p, "來源連結"))
