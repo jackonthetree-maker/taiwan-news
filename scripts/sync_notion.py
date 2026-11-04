@@ -185,8 +185,32 @@ def convert(blocks):
         if kids:
             node["c"] = kids
         if node["r"] or kids:
-            out.append(node)
+            out.extend(split_lines(node))
     return out
+
+
+LIST_SECTIONS = {"已確認的事實", "各方說法", "查證說明"}
+
+
+def split_lines(node):
+    """一個區塊裡用換行寫了好幾行（例如好幾個人的說法）→ 拆成多個節點"""
+    if not any("\n" in r["x"] for r in node.get("r", [])):
+        return [node]
+    rows, cur = [], []
+    for r in node["r"]:
+        parts = r["x"].split("\n")
+        for i, part in enumerate(parts):
+            if i:
+                rows.append(cur)
+                cur = []
+            if part:
+                cur.append({**r, "x": part})
+    rows.append(cur)
+    rows = [rw for rw in rows if "".join(x["x"] for x in rw).strip()]
+    out = [{"t": node["t"], "r": rw} for rw in rows]
+    if out and node.get("c"):
+        out[-1]["c"] = node["c"]
+    return out or [node]
 
 
 def sections(blocks):
@@ -198,7 +222,15 @@ def sections(blocks):
             secs.append(cur)
         elif cur is not None:
             cur["blocks"].append(b)
-    return [{"title": s["title"], "body": convert(s["blocks"])} for s in secs]
+    out = []
+    for s in secs:
+        body = convert(s["blocks"])
+        if s["title"] in LIST_SECTIONS:
+            for n in body:
+                if n["t"] == "p":
+                    n["t"] = "li"
+        out.append({"title": s["title"], "body": body})
+    return out
 
 
 def text_of(node):
